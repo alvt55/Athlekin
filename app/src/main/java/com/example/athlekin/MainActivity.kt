@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         }
 
         // User is signed in, show the main app
-        Log.d(TAG, "Signed in, redirect to main page")
+        Log.d(TAG, "Signed in, redirect to Athlekin App")
         enableEdgeToEdge()
         setContent {
             AthlekinTheme {

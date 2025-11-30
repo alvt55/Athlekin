@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -26,7 +27,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+
+
+import com.example.athlekin.models.WorkoutsViewModel
 import com.example.athlekin.ui.theme.AthlekinTheme
+
+
+
+
+@Composable
+fun WorkoutList(viewModel : WorkoutsViewModel = viewModel()) {
+    val workouts by viewModel.workouts.collectAsState()
+
+    Column {
+        for (workout in workouts) {
+            Text(workout.name)
+        }
+    }
+
+}
 
 @Preview
 @Composable
