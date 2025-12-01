@@ -4,12 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.athlekin.ui.theme.AthlekinTheme
-import android.content.Intent
 import android.util.Log
+import android.widget.Toast
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
-
-
+import com.example.athlekin.ui.theme.AthlekinTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -19,30 +20,58 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkAuth()
+    }
 
-        val auth = FirebaseAuth.getInstance()
-
-        // Now check user
-        val currentUser = auth.currentUser
-        Log.d(TAG, "currentUser")
-
+    private fun checkAuth() {
+        val currentUser = FirebaseAuth.getInstance().currentUser
 
         if (currentUser == null) {
-            Log.d(TAG, "Not signed in, redirect to OAuth sign-in")
-            // User not signed in, launch FirebaseUI
-            startActivity(Intent(this, FirebaseUIActivity::class.java))
-            finish() // Close MainActivity
-            return
+            Log.d(TAG, "No user signed in, launching FirebaseUI")
+            launchSignInUI()
+        } else {
+            Log.d(TAG, "User signed in: ${currentUser.email}")
+            showMainApp()
         }
+    }
 
-        // User is signed in, show the main app
-        Log.d(TAG, "Signed in, redirect to Athlekin App")
+    private fun launchSignInUI() {
+        val providers = arrayListOf(
+            AuthUI.IdpConfig.GoogleBuilder().build(),
+        )
+
+        val signInIntent = AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .build()
+
+        signInLauncher.launch(signInIntent)
+    }
+
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract()
+    ) { res ->
+        handleSignInResult(res)
+    }
+
+    private fun handleSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+        if (result.resultCode == RESULT_OK) {
+            val user = FirebaseAuth.getInstance().currentUser
+            Log.d(TAG, "Sign-in successful: ${user?.email}")
+            Toast.makeText(this, "Welcome ${user?.displayName}", Toast.LENGTH_SHORT).show()
+            showMainApp()
+        } else {
+            Toast.makeText(this, "Sign-in canceled", Toast.LENGTH_SHORT).show()
+            finish() // user must sign in to continue
+        }
+    }
+
+    private fun showMainApp() {
         enableEdgeToEdge()
         setContent {
             AthlekinTheme {
-                AthlekinApp()
+                AthlekinApp() // Your Compose Navigation + UI
             }
         }
     }
 }
-

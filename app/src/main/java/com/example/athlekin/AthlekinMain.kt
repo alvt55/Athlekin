@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,17 +28,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.athlekin.models.Workout
 
 import com.example.athlekin.models.WorkoutsViewModel
 import com.example.athlekin.ui.theme.AthlekinTheme
 
 
 
-
+@Preview
 @Composable
 fun WorkoutList(viewModel : WorkoutsViewModel = viewModel()) {
     val workouts by viewModel.workouts.collectAsState()
+
+    LaunchedEffect(Unit) {
+        val testWorkout = Workout(name = "testname")
+        viewModel.addWorkout(testWorkout)
+    }
+
 
     Column {
         for (workout in workouts) {
@@ -47,7 +55,8 @@ fun WorkoutList(viewModel : WorkoutsViewModel = viewModel()) {
 
 }
 
-@Preview
+
+// add preview
 @Composable
 fun AthlekinApp() {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
@@ -115,6 +124,7 @@ enum class AppDestinations(
     val icon: ImageVector,
 ) {
     HOME("Home", Icons.Default.Home),
+
     FAVORITES("Favorites", Icons.Default.Favorite),
     PROFILE("Profile", Icons.Default.AccountBox),
 }
@@ -127,7 +137,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
+// add preview
 @Composable
 fun GreetingPreview() {
     AthlekinTheme {
