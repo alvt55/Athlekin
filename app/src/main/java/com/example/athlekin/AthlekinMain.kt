@@ -15,45 +15,92 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.athlekin.models.ExercisesViewModel
 import com.example.athlekin.models.Workout
 
 import com.example.athlekin.models.WorkoutsViewModel
 import com.example.athlekin.ui.theme.AthlekinTheme
 
 
-
 @Preview
 @Composable
-fun WorkoutList(viewModel : WorkoutsViewModel = viewModel()) {
-    val workouts by viewModel.workouts.collectAsState()
+// exercise input field along with submit button
+fun InputSection(modifier: Modifier = Modifier) {
 
-    LaunchedEffect(Unit) {
-        val testWorkout = Workout(name = "testname")
-        viewModel.addWorkout(testWorkout)
-    }
+    var textValue by remember { mutableStateOf("Hello") }
 
+    Column(modifier.fillMaxWidth().padding(15.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        TextField(
+            value = textValue,
+            onValueChange = { textValue = it },
+            label = { Text("Type your Exercise Info Here") }
+        )
+        Button(
+            onClick = {}
 
-    Column {
-        for (workout in workouts) {
-            Text(workout.name)
+        ) {
+            Text("Parse")
         }
     }
 
 }
+
+@Preview
+@Composable
+// list of exercises for the current workout
+fun ExerciseList(modifier: Modifier = Modifier, viewModel: ExercisesViewModel = viewModel(), ) {
+    val exercises by viewModel.exercises.collectAsState()
+
+    Column(modifier = modifier.fillMaxWidth().padding(15.dp)) {
+
+        // header
+        Row(modifier = modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly) {
+            Text(text= "Reps", modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
+            Text(text = "Sets", modifier = Modifier.weight(1f))
+            Text(text = "Exercise", modifier = Modifier.weight(1f))
+        }
+
+        for (exercise in exercises) {
+            ExerciseItem(modifier, exercise.name, exercise.reps, exercise.sets)
+        }
+    }
+
+}
+
+@Composable
+// ui for an exercise item
+fun ExerciseItem(modifier: Modifier = Modifier, name: String = "", reps: Int = 0, sets: Int = 0 ) {
+    Row(modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly) {
+        Text(text= "$reps", modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
+        Text(text = "$sets", modifier = Modifier.weight(1f))
+        Text(name, modifier = Modifier.weight(1f))
+
+    }
+
+}
+
 
 
 // add preview
@@ -109,10 +156,7 @@ fun AthlekinApp() {
             }
 
             // Your existing content
-            Greeting(
-                name = "android",
-                modifier = Modifier.padding(top = 16.dp)
-            )
+
         }
     }
 }
@@ -129,18 +173,3 @@ enum class AppDestinations(
     PROFILE("Profile", Icons.Default.AccountBox),
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-// add preview
-@Composable
-fun GreetingPreview() {
-    AthlekinTheme {
-        Greeting("zwefij")
-    }
-}

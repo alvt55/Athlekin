@@ -1,77 +1,83 @@
 package com.example.athlekin
 
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import android.util.Log
-import android.widget.Toast
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.google.firebase.auth.FirebaseAuth
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+
+import androidx.compose.material3.Button
+
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.athlekin.models.Workout
+import com.example.athlekin.models.WorkoutsViewModel
+
 import com.example.athlekin.ui.theme.AthlekinTheme
+import androidx.compose.runtime.getValue // Import for the 'by' keyword (getter)
+import androidx.compose.runtime.setValue // Import for the 'by' keyword (setter)
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import com.example.athlekin.models.ExercisesViewModel
+
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material3.Icon
+
 
 class MainActivity : ComponentActivity() {
-
-    companion object {
-        private const val TAG = "MainActivity"
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        checkAuth()
-    }
-
-    private fun checkAuth() {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-
-        if (currentUser == null) {
-            Log.d(TAG, "No user signed in, launching FirebaseUI")
-            launchSignInUI()
-        } else {
-            Log.d(TAG, "User signed in: ${currentUser.email}")
-            showMainApp()
-        }
-    }
-
-    private fun launchSignInUI() {
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.GoogleBuilder().build(),
-        )
-
-        val signInIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build()
-
-        signInLauncher.launch(signInIntent)
-    }
-
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ) { res ->
-        handleSignInResult(res)
-    }
-
-    private fun handleSignInResult(result: FirebaseAuthUIAuthenticationResult) {
-        if (result.resultCode == RESULT_OK) {
-            val user = FirebaseAuth.getInstance().currentUser
-            Log.d(TAG, "Sign-in successful: ${user?.email}")
-            Toast.makeText(this, "Welcome ${user?.displayName}", Toast.LENGTH_SHORT).show()
-            showMainApp()
-        } else {
-            Toast.makeText(this, "Sign-in canceled", Toast.LENGTH_SHORT).show()
-            finish() // user must sign in to continue
-        }
-    }
-
-    private fun showMainApp() {
         enableEdgeToEdge()
         setContent {
             AthlekinTheme {
-                AthlekinApp() // Your Compose Navigation + UI
+                HomeScreen()
             }
         }
     }
 }
+    @Preview
+    @Composable
+    // preview of main page
+    fun ScreenPreview() {
+        HomeScreen()
+    }
+
+    @Composable
+    fun HomeScreen(modifier: Modifier = Modifier) {
+        Column(modifier = modifier.fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceEvenly,
+            ) {
+            InputSection()
+            ExerciseList()
+        }
+    }
+
+
+
+
+
+
+
+
+
+

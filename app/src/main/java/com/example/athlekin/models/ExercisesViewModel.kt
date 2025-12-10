@@ -4,24 +4,42 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ExercisesViewModel(private val repo: ExercisesRepo = ExercisesRepo()) : ViewModel() {
 
-    private val _exercises = MutableStateFlow<List<Exercise>>(emptyList())
+
+
+//    private val _exercises = repo.getAllExercises()
+    private val _exercises = MutableStateFlow(
+    listOf(
+        Exercise("Squats", 10, 3),
+        Exercise("bench press", 5, 3)
+    ))
+
     val exercises : StateFlow<List<Exercise>> = _exercises
 
-    fun loadExercises() {
+    val exs = listOf(
+        Exercise("Squats", 10, 3),
+        Exercise("bench press", 5, 3)
+    )
+
+
+    // prac
+//    val highVolExercises : List<Exercise> = exs.filter{
+//        it.reps * it.sets > 60
+//    }
+
+
+
+
+    fun addExercise(ex: Exercise) {
         viewModelScope.launch {
-            _exercises.value = repo.getExercises()
+            repo.addExercise(ex)
         }
     }
-
-fun addExercise(ex: Exercise) {
-    viewModelScope.launch {
-        repo.addExercise(ex)
-    }
-}
 
 
 }
