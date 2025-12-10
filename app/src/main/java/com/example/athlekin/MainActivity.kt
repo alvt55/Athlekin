@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import com.example.athlekin.models.ExercisesViewModel
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
 
 
 class MainActivity : ComponentActivity() {
@@ -63,10 +65,20 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun HomeScreen(modifier: Modifier = Modifier) {
+
+        var bikeOrientation by remember { mutableStateOf(true) }
+
+        var bikeResource = if (bikeOrientation) R.drawable.bike else R.drawable.bike_rev
+
         Column(modifier = modifier.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
             ) {
+
+            Button(onClick= {bikeOrientation = !bikeOrientation}) {
+                Image(painter = painterResource(bikeResource), contentDescription="bike img")
+            }
+
             InputSection()
             ExerciseList()
         }
