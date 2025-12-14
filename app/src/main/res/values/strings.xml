@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Athlekin</string>
+    <string name="bike_forward">bike forward</string>
+    <string name="bike_backward">bike backward</string>
+    <string name="exercise_input">What exercise?</string>
+    <string name="reps">Reps</string>
+    <string name="sets">Sets</string>
+    <string name="exercise">Exercise</string>
 </resources>

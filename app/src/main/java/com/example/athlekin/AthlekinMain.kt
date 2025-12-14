@@ -1,5 +1,7 @@
 package com.example.athlekin
 
+import android.R.attr.onClick
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -39,31 +42,7 @@ import com.example.athlekin.models.WorkoutsViewModel
 import com.example.athlekin.ui.theme.AthlekinTheme
 
 
-@Preview
-@Composable
-// exercise input field along with submit button
-fun InputSection(modifier: Modifier = Modifier) {
 
-    var textValue by remember { mutableStateOf("Hello") }
-
-    Column(modifier.fillMaxWidth().padding(15.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        TextField(
-            value = textValue,
-            onValueChange = { textValue = it },
-            label = { Text("Type your Exercise Info Here") }
-        )
-        Button(
-            onClick = {}
-
-        ) {
-            Text("Parse")
-        }
-    }
-
-}
 
 @Preview
 @Composable
@@ -71,14 +50,16 @@ fun InputSection(modifier: Modifier = Modifier) {
 fun ExerciseList(modifier: Modifier = Modifier, viewModel: ExercisesViewModel = viewModel(), ) {
     val exercises by viewModel.exercises.collectAsState()
 
-    Column(modifier = modifier.fillMaxWidth().padding(15.dp)) {
+    Column(modifier = modifier
+        .fillMaxWidth()
+        .padding(15.dp)) {
 
         // header
         Row(modifier = modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly) {
-            Text(text= "Reps", modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
-            Text(text = "Sets", modifier = Modifier.weight(1f))
-            Text(text = "Exercise", modifier = Modifier.weight(1f))
+            Text(text= stringResource(R.string.reps), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
+            Text(text = stringResource(R.string.sets), modifier = Modifier.weight(1f))
+            Text(text = stringResource(R.string.exercise), modifier = Modifier.weight(1f))
         }
 
         for (exercise in exercises) {

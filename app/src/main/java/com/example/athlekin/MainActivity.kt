@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,7 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material3.Icon
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 
 
 class MainActivity : ComponentActivity() {
@@ -60,7 +62,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     // preview of main page
     fun ScreenPreview() {
-        HomeScreen()
+        AthlekinTheme {
+            HomeScreen()
+        }
     }
 
     @Composable
@@ -69,6 +73,9 @@ class MainActivity : ComponentActivity() {
         var bikeOrientation by remember { mutableStateOf(true) }
 
         var bikeResource = if (bikeOrientation) R.drawable.bike else R.drawable.bike_rev
+        var bikeString =  if (bikeOrientation) R.string.bike_forward else R.string.bike_backward
+
+        var exerciseName by remember { mutableStateOf("") }
 
         Column(modifier = modifier.fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -76,14 +83,69 @@ class MainActivity : ComponentActivity() {
             ) {
 
             Button(onClick= {bikeOrientation = !bikeOrientation}) {
-                Image(painter = painterResource(bikeResource), contentDescription="bike img")
+                Image(painter = painterResource(bikeResource), contentDescription=stringResource(bikeString))
             }
 
-            InputSection()
+            TextInput(
+                value = exerciseName,
+                onValueChange = { exerciseName = it },
+                label = R.string.exercise_input
+            )
             ExerciseList()
         }
     }
 
+
+
+
+@Composable
+// exercise input field along with submit button
+fun TextInput(
+    @StringRes label: Int,
+    value : String,
+    onValueChange : (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+    TextField(
+        value,
+        onValueChange,
+        label = { Text(stringResource(label)) }
+    )
+
+}
+
+
+
+
+
+// // for the LLM input later
+//@Composable
+//// exercise input field along with submit button
+//fun InputSection(modifier: Modifier = Modifier) {
+//
+//    var textValue by remember { mutableStateOf("") }
+//
+//    Column(modifier
+//        .fillMaxWidth()
+//        .padding(15.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.spacedBy(10.dp)
+//    ) {
+//        TextField(
+//            value = textValue,
+//            onValueChange = { textValue = it },
+//            label = {stringResource(R.string.exercise_input)}
+//        )
+//        Button(
+//            onClick = {}
+//
+//        ) {
+//            Text("Parse")
+//        }
+//    }
+//
+//}
 
 
 
