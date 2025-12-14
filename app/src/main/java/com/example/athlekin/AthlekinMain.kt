@@ -1,13 +1,17 @@
 package com.example.athlekin
 
+import android.R.attr.name
 import android.R.attr.onClick
+import android.R.attr.text
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.Favorite
@@ -35,13 +39,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.athlekin.models.Exercise
 import com.example.athlekin.models.ExercisesViewModel
 import com.example.athlekin.models.Workout
 
 import com.example.athlekin.models.WorkoutsViewModel
 import com.example.athlekin.ui.theme.AthlekinTheme
-
-
+import androidx.compose.foundation.lazy.items
+import com.example.athlekin.models.ExercisesViewModel.testData.exerciseList
 
 
 @Preview
@@ -50,33 +55,33 @@ import com.example.athlekin.ui.theme.AthlekinTheme
 fun ExerciseList(modifier: Modifier = Modifier, viewModel: ExercisesViewModel = viewModel(), ) {
     val exercises by viewModel.exercises.collectAsState()
 
-    Column(modifier = modifier
+    // header
+    Row(modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly) {
+        Text(text= stringResource(R.string.reps), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
+        Text(text = stringResource(R.string.sets), modifier = Modifier.weight(1f))
+        Text(text = stringResource(R.string.exercise), modifier = Modifier.weight(1f))
+    }
+
+    LazyColumn(modifier = modifier
         .fillMaxWidth()
         .padding(15.dp)) {
-
-        // header
-        Row(modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly) {
-            Text(text= stringResource(R.string.reps), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
-            Text(text = stringResource(R.string.sets), modifier = Modifier.weight(1f))
-            Text(text = stringResource(R.string.exercise), modifier = Modifier.weight(1f))
+        items(exercises) { exercise ->
+            ExerciseItem(exercise)
         }
 
-        for (exercise in exercises) {
-            ExerciseItem(modifier, exercise.name, exercise.reps, exercise.sets)
-        }
     }
 
 }
 
 @Composable
 // ui for an exercise item
-fun ExerciseItem(modifier: Modifier = Modifier, name: String = "", reps: Int = 0, sets: Int = 0 ) {
+fun ExerciseItem(exercise : Exercise, modifier: Modifier = Modifier) {
     Row(modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly) {
-        Text(text= "$reps", modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
-        Text(text = "$sets", modifier = Modifier.weight(1f))
-        Text(name, modifier = Modifier.weight(1f))
+        Text(text= exercise.reps.toString(), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
+        Text(text = exercise.sets.toString(), modifier = Modifier.weight(1f))
+        Text(text=exercise.name, modifier = Modifier.weight(1f))
 
     }
 
