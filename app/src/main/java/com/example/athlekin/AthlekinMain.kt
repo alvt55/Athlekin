@@ -49,43 +49,7 @@ import androidx.compose.foundation.lazy.items
 import com.example.athlekin.models.ExercisesViewModel.testData.exerciseList
 
 
-@Preview
-@Composable
-// list of exercises for the current workout
-fun ExerciseList(modifier: Modifier = Modifier, viewModel: ExercisesViewModel = viewModel(), ) {
-    val exercises by viewModel.exercises.collectAsState()
 
-    // header
-    Row(modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly) {
-        Text(text= stringResource(R.string.reps), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
-        Text(text = stringResource(R.string.sets), modifier = Modifier.weight(1f))
-        Text(text = stringResource(R.string.exercise), modifier = Modifier.weight(1f))
-    }
-
-    LazyColumn(modifier = modifier
-        .fillMaxWidth()
-        .padding(15.dp)) {
-        items(exercises) { exercise ->
-            ExerciseItem(exercise)
-        }
-
-    }
-
-}
-
-@Composable
-// ui for an exercise item
-fun ExerciseItem(exercise : Exercise, modifier: Modifier = Modifier) {
-    Row(modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly) {
-        Text(text= exercise.reps.toString(), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
-        Text(text = exercise.sets.toString(), modifier = Modifier.weight(1f))
-        Text(text=exercise.name, modifier = Modifier.weight(1f))
-
-    }
-
-}
 
 
 

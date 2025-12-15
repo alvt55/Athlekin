@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 
 import androidx.compose.material3.Button
@@ -42,9 +46,16 @@ import com.example.athlekin.models.ExercisesViewModel
 
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import com.example.athlekin.models.Exercise
 
 
 class MainActivity : ComponentActivity() {
@@ -52,8 +63,13 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AthlekinTheme {
-                HomeScreen()
+            AthlekinTheme() {
+                Surface(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    HomeScreen()
+                }
+
             }
         }
     }
@@ -62,8 +78,13 @@ class MainActivity : ComponentActivity() {
     @Composable
     // preview of main page
     fun ScreenPreview() {
-        AthlekinTheme {
-            HomeScreen()
+        AthlekinTheme() {
+            Surface(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                HomeScreen()
+            }
+
         }
     }
 
@@ -72,12 +93,12 @@ class MainActivity : ComponentActivity() {
 
         var bikeOrientation by remember { mutableStateOf(true) }
 
-        var bikeResource = if (bikeOrientation) R.drawable.bike else R.drawable.bike_rev
-        var bikeString =  if (bikeOrientation) R.string.bike_forward else R.string.bike_backward
+        val bikeResource = if (bikeOrientation) R.drawable.bike else R.drawable.bike_rev
+        val bikeString =  if (bikeOrientation) R.string.bike_forward else R.string.bike_backward
 
         var exerciseName by remember { mutableStateOf("") }
 
-        Column(modifier = modifier.fillMaxHeight(),
+        Column(modifier = modifier.fillMaxSize().padding(dimensionResource(R.dimen.padding_small)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
             ) {
@@ -115,6 +136,63 @@ fun TextInput(
 
 }
 
+
+
+@Composable
+// list of exercises for the current workout
+fun ExerciseList(modifier: Modifier = Modifier, viewModel: ExercisesViewModel = viewModel(), ) {
+    val exercises by viewModel.exercises.collectAsState()
+
+    Column(modifier = modifier) {
+        // header
+        Row(modifier = modifier.fillMaxWidth().padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly) {
+
+            ProvideTextStyle(
+                value = MaterialTheme.typography.displayMedium
+            ) {
+                Text(text= stringResource(R.string.reps),
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Left)
+                Text(text = stringResource(R.string.sets), modifier = Modifier.weight(1f))
+                Text(text = stringResource(R.string.exercise), modifier = Modifier.weight(3f))
+            }
+
+        }
+
+
+            LazyColumn() {
+                items(exercises) {
+                    ExerciseItem(
+                        exercise = it,
+//                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
+
+        }
+
+    }
+
+
+
+
+}
+
+@Composable
+// ui for an exercise item
+fun ExerciseItem(exercise : Exercise, modifier: Modifier = Modifier) {
+    Card(modifier = modifier) {
+        Row(modifier = modifier.fillMaxWidth()) {
+            Text(text= exercise.reps.toString(), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
+            Text(text = exercise.sets.toString(), modifier = Modifier.weight(1f))
+            Text(text=exercise.name, modifier = Modifier.weight(3f))
+
+        }
+    }
+
+
+}
 
 
 
