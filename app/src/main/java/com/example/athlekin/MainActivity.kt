@@ -64,6 +64,7 @@ import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.Alignment
+import com.example.athlekin.ui.WorkoutViewModel
 
 
 class MainActivity : ComponentActivity() {
@@ -97,16 +98,21 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun HomeScreen(modifier: Modifier = Modifier) {
+    fun HomeScreen(modifier: Modifier = Modifier, viewModel: WorkoutViewModel = viewModel()) {
 
         var bikeOrientation by remember { mutableStateOf(true) }
 
         val bikeResource = if (bikeOrientation) R.drawable.bike else R.drawable.bike_rev
         val bikeString =  if (bikeOrientation) R.string.bike_forward else R.string.bike_backward
 
-        var exerciseName by remember { mutableStateOf("") }
+        val inputExerciseName = viewModel.inputExerciseName
 
-        Column(modifier = modifier.fillMaxSize().padding(dimensionResource(R.dimen.padding_small)),
+        val workoutUiState by viewModel.uiState.collectAsState()
+
+
+        Column(modifier = modifier
+            .fillMaxSize()
+            .padding(dimensionResource(R.dimen.padding_small)),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
             ) {
@@ -116,11 +122,17 @@ class MainActivity : ComponentActivity() {
             }
 
             TextInput(
-                value = exerciseName,
-                onValueChange = { exerciseName = it },
+                value = inputExerciseName,
+                onValueChange = { viewModel.updateExerciseName(it) },
                 label = R.string.exercise_input
             )
-            ExerciseList()
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { viewModel.addExercise()}
+            ) {
+                Text("Submit")
+            }
+            ExerciseList(workoutUiState.exercises)
         }
     }
 
@@ -148,12 +160,13 @@ fun TextInput(
 
 @Composable
 // list of exercises for the current workout
-fun ExerciseList(modifier: Modifier = Modifier, viewModel: ExercisesViewModel = viewModel(), ) {
-    val exercises by viewModel.exercises.collectAsState()
+fun ExerciseList(exerciseList : List<Exercise>, modifier: Modifier = Modifier) {
 
     Column(modifier = modifier) {
         // header
-        Row(modifier = modifier.fillMaxWidth().padding(10.dp),
+        Row(modifier = modifier
+            .fillMaxWidth()
+            .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceEvenly) {
 
             ProvideTextStyle(
@@ -170,7 +183,7 @@ fun ExerciseList(modifier: Modifier = Modifier, viewModel: ExercisesViewModel = 
 
 
             LazyColumn() {
-                items(exercises) {
+                items(exerciseList) {
                     ExerciseItem(
                         exercise = it,
 //                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
