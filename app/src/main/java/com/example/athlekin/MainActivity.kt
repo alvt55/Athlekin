@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 
 import androidx.compose.material3.Button
 
@@ -38,7 +40,6 @@ import com.example.athlekin.models.WorkoutsViewModel
 import com.example.athlekin.ui.theme.AthlekinTheme
 import androidx.compose.runtime.getValue // Import for the 'by' keyword (getter)
 import androidx.compose.runtime.setValue // Import for the 'by' keyword (setter)
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,6 +49,7 @@ import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Scaffold
@@ -56,6 +58,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.athlekin.models.Exercise
+
+import androidx.compose.material.icons.filled.ExpandMore
+
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.Alignment
 
 
 class MainActivity : ComponentActivity() {
@@ -173,23 +181,60 @@ fun ExerciseList(modifier: Modifier = Modifier, viewModel: ExercisesViewModel = 
         }
 
     }
+}
 
 
-
+// dropdown button
+@Composable
+private fun ExpandButton(
+    expanded: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = modifier
+    ){
+        Icon(
+            imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+            contentDescription = stringResource(R.string.expand_button_content_description),
+            tint = MaterialTheme.colorScheme.secondary
+        )
+    }
 
 }
 
 @Composable
 // ui for an exercise item
 fun ExerciseItem(exercise : Exercise, modifier: Modifier = Modifier) {
-    Card(modifier = modifier) {
-        Row(modifier = modifier.fillMaxWidth()) {
-            Text(text= exercise.reps.toString(), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
-            Text(text = exercise.sets.toString(), modifier = Modifier.weight(1f))
-            Text(text=exercise.name, modifier = Modifier.weight(3f))
+
+    var expanded by remember {mutableStateOf(false)}
+
+    Column() {
+        Card(modifier = modifier) {
+            Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Text(text= exercise.reps.toString(), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
+                Text(text = exercise.sets.toString(), modifier = Modifier.weight(1f))
+                Text(text=exercise.name, modifier = Modifier.weight(3f))
+                ExpandButton(expanded = expanded, onClick = {expanded = !expanded})
+
+            }
+
+            // expanded section
+            if (expanded) {
+                Column(
+                    modifier = modifier
+                ) {
+                    Text(
+                        text = "Total volume: ${exercise.reps * exercise.sets}",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                }
+            }
 
         }
     }
+
 
 
 }
