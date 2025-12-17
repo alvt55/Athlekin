@@ -1,6 +1,7 @@
 package com.example.athlekin
 
 
+import android.R.attr.label
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 
@@ -60,6 +62,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.athlekin.models.Exercise
 
 import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.Remove
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -126,6 +129,20 @@ class MainActivity : ComponentActivity() {
                 onValueChange = { viewModel.updateExerciseName(it) },
                 label = R.string.exercise_input
             )
+
+            Row () {
+                NumberStepper(
+                    value = viewModel.inputSets,
+                    onValueChange = { viewModel.updateSets(it) },
+                    label="Sets"
+                )
+                NumberStepper(
+                    value = viewModel.inputReps,
+                    onValueChange = { viewModel.updateReps(it) },
+                    label="Reps"
+                )
+            }
+
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { viewModel.addExercise()}
@@ -140,7 +157,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-// exercise input field along with submit button
+// exercise input field
 fun TextInput(
     @StringRes label: Int,
     value : String,
@@ -155,6 +172,48 @@ fun TextInput(
     )
 
 }
+
+@Composable
+fun NumberStepper(
+    value: Int,
+    onValueChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    min: Int = 0,
+    max: Int = Int.MAX_VALUE,
+    label: String = ""
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Text(label)
+        IconButton(
+            onClick = {
+                if (value > min) onValueChange(value - 1)
+            },
+            enabled = value > min
+        ) {
+            Icon(Icons.Default.Remove, contentDescription = "Decrement")
+        }
+
+        Text(
+            text = value.toString(),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 12.dp)
+        )
+
+        IconButton(
+            onClick = {
+                if (value < max) onValueChange(value + 1)
+            },
+            enabled = value < max
+        ) {
+            Icon(Icons.Default.Add, contentDescription = "Increment")
+        }
+    }
+}
+
 
 
 

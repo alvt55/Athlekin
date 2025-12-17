@@ -2,6 +2,7 @@ package com.example.athlekin.ui
 
 import android.R.attr.name
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.update
 
 class WorkoutViewModel : ViewModel(){
 
+    // mutable list?
 //    private val _exerciseList = MutableStateFlow<List<Exercise>>(emptyList())
 //    val exerciseList : StateFlow<List<Exercise>> = _exerciseList.asStateFlow()
 
@@ -23,12 +25,25 @@ class WorkoutViewModel : ViewModel(){
     var inputExerciseName by mutableStateOf("")
         private set
 
+    var inputReps by mutableIntStateOf(0)
+        private set
+    var inputSets by mutableIntStateOf(0)
+        private set
+
     fun updateExerciseName(name : String){
         inputExerciseName = name
     }
 
+    fun updateReps(reps : Int){
+        inputReps = reps
+    }
+
+    fun updateSets(sets : Int){
+        inputSets = sets
+    }
+
     fun addExercise() {
-        val currExercise = Exercise(inputExerciseName)
+        val currExercise = Exercise(inputExerciseName, inputReps, inputSets)
 
         _uiState.update { currentState ->
             currentState.copy(
