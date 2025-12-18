@@ -221,7 +221,7 @@ fun NumberStepper(
 // list of exercises for the current workout
 fun ExerciseList(exerciseList : List<Exercise>, modifier: Modifier = Modifier) {
 
-    Column(modifier = modifier) {
+    Column(modifier = modifier.fillMaxHeight(0.3f)) {
         // header
         Row(modifier = modifier
             .fillMaxWidth()
