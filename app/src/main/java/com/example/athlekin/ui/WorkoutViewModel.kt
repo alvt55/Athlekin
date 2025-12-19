@@ -25,6 +25,9 @@ class WorkoutViewModel : ViewModel(){
     var inputExerciseName by mutableStateOf("")
         private set
 
+    var inputWorkoutName by mutableStateOf("")
+        private set
+
     var inputReps by mutableIntStateOf(0)
         private set
     var inputSets by mutableIntStateOf(0)
@@ -34,6 +37,20 @@ class WorkoutViewModel : ViewModel(){
         inputExerciseName = name
     }
 
+
+    // TODO: change this to debounce callback
+    fun updateWorkoutName(name : String){
+        inputWorkoutName = name
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                name = name
+            )
+        }
+    }
+
+
+
     fun updateReps(reps : Int){
         inputReps = reps
     }
@@ -42,13 +59,35 @@ class WorkoutViewModel : ViewModel(){
         inputSets = sets
     }
 
-    fun addExercise() {
-        val currExercise = Exercise(inputExerciseName, inputReps, inputSets)
 
-        _uiState.update { currentState ->
-            currentState.copy(
-                exercises = currentState.exercises + currExercise
-            )
+    // given that reps, sets and exerciseName is filled, add exercise to UiState
+    fun addExercise() {
+
+        if (inputReps > 0 && inputSets > 0 && inputExerciseName != "") {
+            val currExercise = Exercise(inputExerciseName, inputReps, inputSets)
+
+            _uiState.update { currentState ->
+                currentState.copy(
+                    exercises = currentState.exercises + currExercise
+                )
+            }
+
+            // reset input fields
+            updateExerciseName("")
+            updateSets(0)
+            updateReps(0)
+        }
+
+
+    }
+
+    // TODO: complete this when data source is added
+    // given that the exercise list and name is not empty, reset the Ui data object
+    fun endWorkout() {
+
+        if (_uiState.value.exercises.size != 0 && _uiState.value.name != "") {
+            _uiState.value = WorkoutUiState()
+            updateWorkoutName("")
         }
     }
 

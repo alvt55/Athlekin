@@ -109,6 +109,7 @@ class MainActivity : ComponentActivity() {
         val bikeString =  if (bikeOrientation) R.string.bike_forward else R.string.bike_backward
 
         val inputExerciseName = viewModel.inputExerciseName
+        val inputWorkoutName = viewModel.inputWorkoutName
 
         val workoutUiState by viewModel.uiState.collectAsState()
 
@@ -119,6 +120,13 @@ class MainActivity : ComponentActivity() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
             ) {
+
+
+            TextInput(
+                value = inputWorkoutName,
+                onValueChange = { viewModel.updateWorkoutName(it) },
+                label = R.string.workout_input
+            )
 
             Button(onClick= {bikeOrientation = !bikeOrientation}) {
                 Image(painter = painterResource(bikeResource), contentDescription=stringResource(bikeString))
@@ -150,6 +158,13 @@ class MainActivity : ComponentActivity() {
                 Text("Submit")
             }
             ExerciseList(workoutUiState.exercises)
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { viewModel.endWorkout()}
+            ) {
+                Text("End Workout")
+            }
         }
     }
 
