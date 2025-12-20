@@ -1,24 +1,43 @@
 package com.example.athlekin.ui.test
 
+import android.R.attr.name
 import com.example.athlekin.models.Exercise
 import com.example.athlekin.ui.WorkoutUiState
 import com.example.athlekin.ui.WorkoutViewModel
+import kotlinx.coroutines.flow.update
 import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Before
 
 class WorkoutViewModelTest {
 
-    private val viewModel = WorkoutViewModel()
-    val testName = "Test name"
-    val testName2 = "Test name2"
-    val testReps = 5
-    val testSets = 3
+    private lateinit var viewModel: WorkoutViewModel
+    private lateinit var currentWorkoutUiState: WorkoutUiState
+
+    // Test data as class properties
+    private val testName = "Test name"
+    private val testName2 = "Test name2"
+    private val testReps = 5
+    private val testSets = 3
+    private lateinit var validExercise: Exercise
+    private lateinit var validExercise2: Exercise
+    private lateinit var validListExercise1and2: List<Exercise>
+
+    @Before
+    fun setup() {
+        viewModel = WorkoutViewModel()
+        currentWorkoutUiState = viewModel.uiState.value
+
+        // Initialize test data
+        validExercise = Exercise(testName, testReps, testSets)
+        validExercise2 = Exercise(testName2, testReps, testSets)
+        validListExercise1and2 = listOf(validExercise, validExercise2)
+    }
 
 
     @Test
     fun workoutViewModel_ValidExerciseAdded_ExerciseAddedAndInputsReset() {
-        var currentWorkoutUiState = viewModel.uiState.value
 
         // setup fields with the test inputs
         viewModel.updateExerciseName(testName)
@@ -28,14 +47,9 @@ class WorkoutViewModelTest {
         // call the addExercise to test
         viewModel.addExercise()
 
-        // updated Ui State
-        currentWorkoutUiState = viewModel.uiState.value
-
-        val exerciseAdded = Exercise(testName, testReps, testSets)
-
-
         // assertions
-        assertEquals(currentWorkoutUiState.exercises, listOf(exerciseAdded))
+        currentWorkoutUiState = viewModel.uiState.value
+        assertEquals(currentWorkoutUiState.exercises, listOf(validExercise))
         assertEquals(viewModel.inputExerciseName, "")
         assertEquals(viewModel.inputReps, 0)
         assertEquals(viewModel.inputSets, 0)
@@ -44,7 +58,7 @@ class WorkoutViewModelTest {
 
     @Test
     fun workoutViewModel_ValidExerciseAddedMultiple_ExerciseAddedAndInputsReset() {
-        var currentWorkoutUiState = viewModel.uiState.value
+
 
         // setup fields with the test inputs
         viewModel.updateExerciseName(testName)
@@ -60,15 +74,10 @@ class WorkoutViewModelTest {
         viewModel.updateSets(testSets)
         viewModel.addExercise()
 
-        // updated Ui State
-        currentWorkoutUiState = viewModel.uiState.value
-
-        val exerciseAdded = Exercise(testName, testReps, testSets)
-        val exerciseAdded2 = Exercise(testName2, testReps, testSets)
-
 
         // assertions
-        assertEquals(currentWorkoutUiState.exercises, listOf(exerciseAdded, exerciseAdded2))
+        currentWorkoutUiState = viewModel.uiState.value
+        assertEquals(currentWorkoutUiState.exercises, validListExercise1and2)
         assertEquals(viewModel.inputExerciseName, "")
         assertEquals(viewModel.inputReps, 0)
         assertEquals(viewModel.inputSets, 0)
@@ -77,32 +86,83 @@ class WorkoutViewModelTest {
 
     @Test
     fun workoutViewModel_MissingInputsAddExercise_ExerciseNotAddedInputsStay() {
-        var currentWorkoutUiState = viewModel.uiState.value
+
 
         // setup fields with no reps or sets
         viewModel.updateExerciseName(testName)
-        viewModel.updateReps(0)
+        viewModel.updateReps(-1)
         viewModel.updateSets(0)
 
         // call the addExercise to test
         viewModel.addExercise()
 
-        // updated Ui State
-        currentWorkoutUiState = viewModel.uiState.value
-
-
         // assertions
+        currentWorkoutUiState = viewModel.uiState.value
         assertEquals(currentWorkoutUiState.exercises, emptyList<Exercise>())
         assertEquals(viewModel.inputExerciseName, testName)
-        assertEquals(viewModel.inputReps, 0)
+        assertEquals(viewModel.inputReps, -1)
         assertEquals(viewModel.inputSets, 0)
 
     }
-//
-//    @Teset
-//    fun workoutViewModel_ValidEndWorkout_ResetState() {
-//
-//        val exercise = Exercise("test name", )
-//        viewModel.uiState = WorkoutUiState("test name", listOf())
-//    }
+
+
+    @Test
+    fun workoutViewModel_UiStateSetter_ShouldSet() {
+
+        // call setter function
+        viewModel.setUiStateForTest(WorkoutUiState(testName, validListExercise1and2))
+
+        // sanity check that the setting uistate works for testing
+        currentWorkoutUiState = viewModel.uiState.value
+        assertEquals(currentWorkoutUiState.name, testName)
+        assertEquals(currentWorkoutUiState.exercises, validListExercise1and2)
+
+    }
+
+    @Test
+    fun workoutViewModel_ValidEndWorkout_ResetState() {
+
+        // setup viewModel to have a "submittable" state
+        viewModel.setUiStateForTest(WorkoutUiState(testName, validListExercise1and2))
+        viewModel.endWorkout()
+
+        // assertions
+        currentWorkoutUiState = viewModel.uiState.value
+        assertEquals(currentWorkoutUiState.name, "")
+        assertEquals(currentWorkoutUiState.exercises, emptyList<Exercise>())
+        assertEquals(viewModel.inputWorkoutName, "")
+
+    }
+
+    @Test
+    fun workoutViewModel_NoNameEndWorkout_DontResetState() {
+
+        // setup viewModel to have a invalid submit - no exercises
+        viewModel.setUiStateForTest(WorkoutUiState("", validListExercise1and2))
+        viewModel.endWorkout()
+
+        currentWorkoutUiState = viewModel.uiState.value
+        assertEquals(currentWorkoutUiState.name, "")
+        assertEquals(currentWorkoutUiState.exercises, validListExercise1and2)
+
+
+    }
+
+    @Test
+    fun workoutViewModel_NoExercisesEndWorkout_DontResetState() {
+
+        // setup viewModel to have a invalid submit - no exercises
+        viewModel.setUiStateForTest(WorkoutUiState(testName, emptyList<Exercise>()))
+        viewModel.updateWorkoutName(testName) // update input variable too
+        viewModel.endWorkout()
+
+        currentWorkoutUiState = viewModel.uiState.value
+        assertEquals(currentWorkoutUiState.name, testName)
+        assertEquals(viewModel.inputWorkoutName, testName) // test ui not reset
+        assertEquals(currentWorkoutUiState.exercises, emptyList<Exercise>())
+
+
+    }
+
+
 }

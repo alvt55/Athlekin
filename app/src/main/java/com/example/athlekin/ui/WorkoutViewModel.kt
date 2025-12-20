@@ -91,6 +91,10 @@ class WorkoutViewModel : ViewModel(){
         }
     }
 
+    internal fun setUiStateForTest(state: WorkoutUiState) {
+        _uiState.value = state
+    }
+
 
 
 
