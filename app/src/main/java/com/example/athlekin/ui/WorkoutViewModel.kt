@@ -1,11 +1,12 @@
 package com.example.athlekin.ui
 
-import android.R.attr.name
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.athlekin.data.Exercise
+import com.example.athlekin.data.WorkoutUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,9 +28,9 @@ class WorkoutViewModel : ViewModel(){
     var inputWorkoutName by mutableStateOf("")
         private set
 
-    var inputReps by mutableIntStateOf(0)
+    var inputReps by mutableIntStateOf(1)
         private set
-    var inputSets by mutableIntStateOf(0)
+    var inputSets by mutableIntStateOf(1)
         private set
 
     fun updateExerciseName(name : String){
@@ -73,8 +74,8 @@ class WorkoutViewModel : ViewModel(){
 
             // reset input fields
             updateExerciseName("")
-            updateSets(0)
-            updateReps(0)
+            updateSets(1)
+            updateReps(1)
         }
 
 

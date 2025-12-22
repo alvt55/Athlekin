@@ -1,13 +1,10 @@
 package com.example.athlekin.ui.test
 
-import android.R.attr.name
 import com.example.athlekin.models.Exercise
-import com.example.athlekin.ui.WorkoutUiState
+import com.example.athlekin.data.WorkoutUiState
 import com.example.athlekin.ui.WorkoutViewModel
-import kotlinx.coroutines.flow.update
 import org.junit.Test
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Before
 
 class WorkoutViewModelTest {

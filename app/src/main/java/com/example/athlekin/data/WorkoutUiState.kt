@@ -1,4 +1,4 @@
-package com.example.athlekin.ui
+package com.example.athlekin.data
 
 
 
