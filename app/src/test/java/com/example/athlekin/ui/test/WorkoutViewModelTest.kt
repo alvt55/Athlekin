@@ -85,12 +85,54 @@ class WorkoutViewModelTest {
     }
 
     @Test
-    fun workoutViewModel_MissingInputsAddExercise_ExerciseNotAddedInputsStay() {
+    fun workoutViewModel_MissingNameAddExercise_ExerciseNotAddedInputsStay() {
+
+
+        // setup fields with no reps or sets
+        viewModel.updateExerciseName("")
+        viewModel.updateReps(testReps)
+        viewModel.updateSets(testSets)
+
+        // call the addExercise to test
+        viewModel.addExercise()
+
+        // assertions
+        currentWorkoutUiState = viewModel.uiState.value
+        assertEquals(currentWorkoutUiState.exercises, emptyList<Exercise>())
+        assertEquals(viewModel.inputExerciseName, "")
+        assertEquals(viewModel.inputReps, testReps)
+        assertEquals(viewModel.inputSets, testSets)
+
+    }
+
+    @Test
+    fun workoutViewModel_MissingRepsAddExercise_ExerciseNotAddedInputsStay() {
 
 
         // setup fields with no reps or sets
         viewModel.updateExerciseName(testName)
-        viewModel.updateReps(-1)
+        viewModel.updateReps(0)
+        viewModel.updateSets(testSets)
+
+        // call the addExercise to test
+        viewModel.addExercise()
+
+        // assertions
+        currentWorkoutUiState = viewModel.uiState.value
+        assertEquals(currentWorkoutUiState.exercises, emptyList<Exercise>())
+        assertEquals(viewModel.inputExerciseName, testName)
+        assertEquals(viewModel.inputReps, 0)
+        assertEquals(viewModel.inputSets, testSets)
+
+    }
+
+    @Test
+    fun workoutViewModel_MissingSetsAddExercise_ExerciseNotAddedInputsStay() {
+
+
+        // setup fields with no reps or sets
+        viewModel.updateExerciseName(testName)
+        viewModel.updateReps(testReps)
         viewModel.updateSets(0)
 
         // call the addExercise to test
@@ -100,10 +142,11 @@ class WorkoutViewModelTest {
         currentWorkoutUiState = viewModel.uiState.value
         assertEquals(currentWorkoutUiState.exercises, emptyList<Exercise>())
         assertEquals(viewModel.inputExerciseName, testName)
-        assertEquals(viewModel.inputReps, -1)
+        assertEquals(viewModel.inputReps, testReps)
         assertEquals(viewModel.inputSets, 0)
 
     }
+
 
 
     @Test
