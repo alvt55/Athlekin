@@ -20,7 +20,7 @@ fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) ->
 
         // share button placeholder
         Button(onClick= { onShareButton("test summary to share") }) {
-            Text("To Tracking")
+            Text("Share Workouts")
         }
     }
 
