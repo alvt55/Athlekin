@@ -59,7 +59,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import com.example.athlekin.models.Exercise
 
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Remove
@@ -67,6 +66,7 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.Alignment
+import com.example.athlekin.ui.Exercise
 import com.example.athlekin.ui.WorkoutViewModel
 
 
@@ -103,10 +103,6 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun HomeScreen(modifier: Modifier = Modifier, viewModel: WorkoutViewModel = viewModel()) {
 
-        var bikeOrientation by remember { mutableStateOf(true) }
-
-        val bikeResource = if (bikeOrientation) R.drawable.bike else R.drawable.bike_rev
-        val bikeString =  if (bikeOrientation) R.string.bike_forward else R.string.bike_backward
 
         val inputExerciseName = viewModel.inputExerciseName
         val inputWorkoutName = viewModel.inputWorkoutName
@@ -127,10 +123,6 @@ class MainActivity : ComponentActivity() {
                 onValueChange = { viewModel.updateWorkoutName(it) },
                 label = R.string.workout_input
             )
-
-            Button(onClick= {bikeOrientation = !bikeOrientation}) {
-                Image(painter = painterResource(bikeResource), contentDescription=stringResource(bikeString))
-            }
 
             TextInput(
                 value = inputExerciseName,
@@ -193,7 +185,7 @@ fun NumberStepper(
     value: Int,
     onValueChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    min: Int = 0,
+    min: Int = 1,
     max: Int = Int.MAX_VALUE,
     label: String = ""
 ) {
