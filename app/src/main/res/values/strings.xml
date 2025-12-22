@@ -8,4 +8,5 @@
     <string name="exercise">Exercise</string>
     <string name="expand_button_content_description">expand</string>
     <string name="workout_input">Workout name</string>
+    <string name="workout_share">Sharing Workout...</string>
 </resources>

@@ -10,11 +10,16 @@ import androidx.compose.ui.Modifier
 
 @Composable
 // list of exercises for the current workout
-fun WorkoutsScreen(onToTrackingClicked : () -> Unit, modifier: Modifier = Modifier) {
+fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) -> Unit, modifier: Modifier = Modifier) {
 
     Column() {
         Text("hello")
         Button(onClick=onToTrackingClicked) {
+            Text("To Tracking")
+        }
+
+        // share button placeholder
+        Button(onClick= { onShareButton("test summary to share") }) {
             Text("To Tracking")
         }
     }

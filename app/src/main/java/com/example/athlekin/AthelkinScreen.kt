@@ -1,11 +1,14 @@
 package com.example.athlekin
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -35,6 +38,7 @@ fun AthlekinApp(
         val uiState by viewModel.uiState.collectAsState()
 
 
+
         NavHost(
             navController = navController,
             startDestination = AthelkinScreen.Tracking.name,
@@ -48,9 +52,13 @@ fun AthlekinApp(
                 )
             }
             composable(route = AthelkinScreen.Workouts.name) {
+                val context = LocalContext.current
                 // Unfinished screen
                 WorkoutsScreen(
                     onToTrackingClicked = {navController.navigate(AthelkinScreen.Tracking.name)},
+                    onShareButton = { summary: String ->
+                shareWorkouts(context, summary)
+            },
                     modifier = Modifier
                 )
             }
@@ -59,6 +67,21 @@ fun AthlekinApp(
 
     }
 
+}
+
+private fun shareWorkouts(context : Context, summary : String) {
+
+    val intent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, summary)
+    }
+
+    context.startActivity(
+        Intent.createChooser(
+            intent,
+            context.getString(R.string.workout_share)
+        )
+    )
 }
 
 
