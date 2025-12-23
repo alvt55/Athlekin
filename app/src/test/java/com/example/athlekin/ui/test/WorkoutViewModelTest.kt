@@ -1,6 +1,6 @@
 package com.example.athlekin.ui.test
 
-import com.example.athlekin.models.Exercise
+import com.example.athlekin.data.Exercise
 import com.example.athlekin.data.WorkoutUiState
 import com.example.athlekin.ui.WorkoutViewModel
 import org.junit.Test

@@ -24,11 +24,15 @@ import com.example.athlekin.ui.components.TextInput
 
 
 @Composable
-fun TrackingScreen(onToWorkoutsClicked : () -> Unit,  modifier: Modifier = Modifier, viewModel: WorkoutViewModel = viewModel()) {
+fun TrackingScreen(
+    onToWorkoutsClicked : () -> Unit,
+                   onToEndWorkout : () -> Unit,
+                   modifier: Modifier = Modifier,
+                   viewModel: WorkoutViewModel = viewModel()) {
 
 
     val inputExerciseName = viewModel.inputExerciseName
-    val inputWorkoutName = viewModel.inputWorkoutName
+
 
     val workoutUiState by viewModel.uiState.collectAsState()
 
@@ -40,12 +44,6 @@ fun TrackingScreen(onToWorkoutsClicked : () -> Unit,  modifier: Modifier = Modif
         verticalArrangement = Arrangement.SpaceEvenly,
     ) {
 
-
-        TextInput(
-            value = inputWorkoutName,
-            onValueChange = { viewModel.updateWorkoutName(it) },
-            label = R.string.workout_input
-        )
 
         TextInput(
             value = inputExerciseName,
@@ -76,9 +74,9 @@ fun TrackingScreen(onToWorkoutsClicked : () -> Unit,  modifier: Modifier = Modif
 
         Button(
             modifier = Modifier.fillMaxWidth(),
-            onClick = { viewModel.endWorkout()}
+            onClick = onToEndWorkout
         ) {
-            Text("End Workout")
+            Text("Finish")
         }
 
         Button(

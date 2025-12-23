@@ -1,5 +1,6 @@
 package com.example.athlekin
 
+import android.R.attr.name
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.StringRes
@@ -27,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.athlekin.ui.EndWorkoutScreen
 import com.example.athlekin.ui.TrackingScreen
 import com.example.athlekin.ui.WorkoutViewModel
 import com.example.athlekin.ui.WorkoutsScreen
@@ -34,7 +36,9 @@ import com.example.athlekin.ui.WorkoutsScreen
 
 enum class AthelkinScreen(@StringRes val title: Int) {
     Tracking(title = R.string.tracking_page),
+    EndWorkout(title = R.string.end_page),
     Workouts(title = R.string.workouts_page),
+
 }
 
 
@@ -88,8 +92,6 @@ fun AthlekinApp(
     ) { innerPadding ->
         val uiState by viewModel.uiState.collectAsState()
 
-
-
         NavHost(
             navController = navController,
             startDestination = AthelkinScreen.Tracking.name,
@@ -98,6 +100,15 @@ fun AthlekinApp(
             composable(route = AthelkinScreen.Tracking.name) {
                 TrackingScreen(
                     onToWorkoutsClicked = {navController.navigate(AthelkinScreen.Workouts.name)},
+                    onToEndWorkout = { navController.navigate(AthelkinScreen.EndWorkout.name) },
+                    viewModel = viewModel,
+                    modifier = Modifier
+                )
+            }
+            composable(route = AthelkinScreen.EndWorkout.name) {
+                EndWorkoutScreen(
+                    onToWorkoutsClicked = {navController.navigate(AthelkinScreen.Workouts.name)},
+                    onToTrackingClicked = {navController.navigate(AthelkinScreen.Tracking.name)},
                     viewModel = viewModel,
                     modifier = Modifier
                 )
@@ -117,6 +128,10 @@ fun AthlekinApp(
         }
 
     }
+
+}
+
+private fun attemptEndWorkout() {
 
 }
 

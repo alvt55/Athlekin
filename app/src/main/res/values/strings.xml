@@ -12,4 +12,5 @@
     <string name="back_button">back</string>
     <string name="tracking_page">Tracking</string>
     <string name="workouts_page">Workouts</string>
+    <string name="end_page">End Workout</string>
 </resources>
