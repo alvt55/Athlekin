@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,6 +33,7 @@ import com.example.athlekin.ui.EndWorkoutScreen
 import com.example.athlekin.ui.TrackingScreen
 import com.example.athlekin.ui.WorkoutViewModel
 import com.example.athlekin.ui.WorkoutsScreen
+import com.example.athlekin.ui.utils.AthelkinContentType
 
 
 enum class AthelkinScreen(@StringRes val title: Int) {
@@ -73,9 +75,18 @@ fun AthelkinAppBar(
 
 @Composable
 fun AthlekinApp(
+    windowSize: WindowWidthSizeClass,
     viewModel: WorkoutViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+
+    val contentType: AthelkinContentType
+    if (windowSize == WindowWidthSizeClass.Medium || windowSize == WindowWidthSizeClass.Expanded) {
+        contentType = AthelkinContentType.TRACKER_WITH_WORKOUTS
+    } else {
+        contentType = AthelkinContentType.TRACKER_DEFAULT
+    }
+
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = AthelkinScreen.valueOf(
@@ -101,8 +112,9 @@ fun AthlekinApp(
                 TrackingScreen(
                     onToWorkoutsClicked = {navController.navigate(AthelkinScreen.Workouts.name)},
                     onToEndWorkout = { navController.navigate(AthelkinScreen.EndWorkout.name) },
+                    modifier = Modifier,
                     viewModel = viewModel,
-                    modifier = Modifier
+                    contentType = contentType
                 )
             }
             composable(route = AthelkinScreen.EndWorkout.name) {

@@ -26,3 +26,10 @@ fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) ->
 
 
 }
+
+
+@Composable
+fun WorkoutList(modifier: Modifier = Modifier) {
+
+    Text("PLACEHOLDER FOR WORKOUTS")
+}
