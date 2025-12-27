@@ -70,7 +70,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
 
 
     // firebase

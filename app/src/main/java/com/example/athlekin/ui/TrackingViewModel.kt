@@ -18,9 +18,6 @@ import kotlinx.coroutines.flow.update
 
 class TrackingViewModel : ViewModel(){
 
-    // mutable list?
-//    private val _exerciseList = MutableStateFlow<List<Exercise>>(emptyList())
-//    val exerciseList : StateFlow<List<Exercise>> = _exerciseList.asStateFlow()
 
     // not a compose state, therefore needs .collectAsState in the Compose layer
     private val _uiState = MutableStateFlow(WorkoutUiState())

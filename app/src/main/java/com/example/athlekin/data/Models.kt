@@ -10,3 +10,9 @@ data class Exercise(
     val reps: Int = 1,
     val sets: Int = 1,
 )
+
+data class TimeSlot(
+    val startTime: Long = 0,
+    val endTime: Long = 0,
+    val available : Boolean = false
+)

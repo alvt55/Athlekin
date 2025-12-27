@@ -13,18 +13,28 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.athlekin.CalendarViewModel
+import com.example.athlekin.data.CalendarRepo
 import com.example.athlekin.data.Workout
 import com.example.athlekin.ui.TrackingViewModel
 import com.example.athlekin.ui.WorkoutsScreenViewModel
 import com.example.athlekin.ui.components.ExerciseItem
 import com.example.athlekin.ui.components.WorkoutList
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 
+const val WORKOUTS_SCREEN_TAG: String = "CALENDAR"
+
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 // list of exercises for the current workout
 fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) -> Unit, modifier: Modifier = Modifier) {
@@ -32,7 +42,34 @@ fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) ->
     val workoutsViewModel : WorkoutsScreenViewModel = viewModel(factory= WorkoutsScreenViewModel.Factory)
     val workoutsList by workoutsViewModel.workouts.collectAsState()
 
-    Log.i("WORKOUTS SCREEN", workoutsList.toString())
+    Log.i(WORKOUTS_SCREEN_TAG, workoutsList.toString())
+
+
+    val calendarViewModel : CalendarViewModel = viewModel(factory= CalendarViewModel.factory(LocalContext.current))
+
+    val calendarPermissionState = rememberPermissionState(
+        android.Manifest.permission.READ_CALENDAR
+    )
+
+    // Auto-request permission on first load
+    LaunchedEffect(Unit) {
+        if (!calendarPermissionState.status.isGranted) {
+            Log.d(WORKOUTS_SCREEN_TAG,"Auto-requesting calendar permission")
+            calendarPermissionState.launchPermissionRequest()
+        }
+    }
+
+    // Call API when permission is granted
+    LaunchedEffect(calendarPermissionState.status.isGranted) {
+        Log.d(WORKOUTS_SCREEN_TAG, "Permission status: ${calendarPermissionState.status.isGranted}")
+        if (calendarPermissionState.status.isGranted) {
+            Log.d(WORKOUTS_SCREEN_TAG, "Calling getAvailableSlots()")
+            calendarViewModel.getAvailableSlots()
+        }
+    }
+
+
+
     Column() {
 
         WorkoutList(workoutsList)
