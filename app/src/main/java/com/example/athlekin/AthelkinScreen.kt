@@ -1,13 +1,11 @@
 package com.example.athlekin
 
-import android.R.attr.name
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,10 +27,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.athlekin.ui.EndWorkoutScreen
-import com.example.athlekin.ui.TrackingScreen
-import com.example.athlekin.ui.WorkoutViewModel
-import com.example.athlekin.ui.WorkoutsScreen
+import com.example.athlekin.ui.screens.EndWorkoutScreen
+import com.example.athlekin.ui.screens.TrackingScreen
+import com.example.athlekin.ui.TrackingViewModel
+import com.example.athlekin.ui.screens.WorkoutsScreen
 import com.example.athlekin.ui.utils.AthelkinContentType
 
 
@@ -76,7 +74,7 @@ fun AthelkinAppBar(
 @Composable
 fun AthlekinApp(
     windowSize: WindowWidthSizeClass,
-    viewModel: WorkoutViewModel = viewModel(),
+    viewModel: TrackingViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
 

@@ -2,14 +2,19 @@ package com.example.athlekin.ui.test
 
 import com.example.athlekin.data.Exercise
 import com.example.athlekin.data.WorkoutUiState
-import com.example.athlekin.ui.WorkoutViewModel
+import com.example.athlekin.ui.TrackingViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Before
 
 class WorkoutViewModelTest {
 
-    private lateinit var viewModel: WorkoutViewModel
+    private lateinit var viewModel: TrackingViewModel
     private lateinit var currentWorkoutUiState: WorkoutUiState
 
     // Test data as class properties
@@ -23,7 +28,7 @@ class WorkoutViewModelTest {
 
     @Before
     fun setup() {
-        viewModel = WorkoutViewModel()
+        viewModel = TrackingViewModel()
         currentWorkoutUiState = viewModel.uiState.value
 
         // Initialize test data
@@ -32,6 +37,16 @@ class WorkoutViewModelTest {
         validListExercise1and2 = listOf(validExercise, validExercise2)
     }
 
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun workoutViewModel_ShowDoExerciseRunning_TrueFalseFlipping() = runTest {
+
+        launch{viewModel.runShowDoExercise()}
+        advanceTimeBy(200)
+        runCurrent()
+        assertEquals(viewModel.showDoExercise, true)
+    }
 
     @Test
     fun workoutViewModel_ValidExerciseAdded_ExerciseAddedAndInputsReset() {

@@ -1,4 +1,4 @@
-package com.example.athlekin.ui
+package com.example.athlekin.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults.verticalArrangement
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -18,30 +18,43 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 import com.example.athlekin.R
+
+import com.example.athlekin.ui.TrackingViewModel
 import com.example.athlekin.ui.components.ExerciseList
 import com.example.athlekin.ui.components.NumberStepper
 
 import com.example.athlekin.ui.components.TextInput
 import com.example.athlekin.ui.utils.AthelkinContentType
+import kotlinx.coroutines.launch
 
 
 @Composable
 fun TrackingScreen(
     onToWorkoutsClicked : () -> Unit,
-                   onToEndWorkout : () -> Unit,
-                   modifier: Modifier = Modifier,
-                   viewModel: WorkoutViewModel = viewModel(),
+    onToEndWorkout : () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: TrackingViewModel = viewModel(),
     contentType: AthelkinContentType) {
 
 
     val inputExerciseName = viewModel.inputExerciseName
+    val showDoExercise = viewModel.showDoExercise
+
+
 
 
     val workoutUiState by viewModel.uiState.collectAsState()
 
 
 
+    LaunchedEffect(Unit) {
+        launch{viewModel.runShowDoExercise()}
+    }
+
+
     Row(modifier = Modifier.fillMaxSize()) {
+
+
 
         Column(modifier = modifier
             .fillMaxSize()
@@ -95,10 +108,12 @@ fun TrackingScreen(
             ) {
                 Text("To Workouts List")
             }
+
+            Text(showDoExercise.toString())
         }
 
         if (contentType == AthelkinContentType.TRACKER_WITH_WORKOUTS) {
-            WorkoutList(modifier = Modifier.weight(1f))
+            Text("PLACEHOLDER FOR WORKOUT LIST")
         }
     }
 

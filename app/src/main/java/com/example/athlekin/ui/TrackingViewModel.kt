@@ -5,14 +5,18 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+
 import com.example.athlekin.data.Exercise
 import com.example.athlekin.data.WorkoutUiState
+
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class WorkoutViewModel : ViewModel(){
+
+class TrackingViewModel : ViewModel(){
 
     // mutable list?
 //    private val _exerciseList = MutableStateFlow<List<Exercise>>(emptyList())
@@ -32,6 +36,14 @@ class WorkoutViewModel : ViewModel(){
         private set
     var inputSets by mutableIntStateOf(1)
         private set
+
+
+
+    var showDoExercise by mutableStateOf(false)
+        private set
+
+
+
 
     fun updateExerciseName(name : String){
         inputExerciseName = name
@@ -93,6 +105,18 @@ class WorkoutViewModel : ViewModel(){
 
     internal fun setUiStateForTest(state: WorkoutUiState) {
         _uiState.value = state
+    }
+
+
+    suspend fun runShowDoExercise() {
+
+        for (i in 1..5) {      // 1 to 5 inclusive
+            delay(200)
+            showDoExercise = true
+            delay(200)
+            showDoExercise = false
+        }
+
     }
 
 

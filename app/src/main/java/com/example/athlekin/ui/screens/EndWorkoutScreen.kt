@@ -1,4 +1,4 @@
-package com.example.athlekin.ui
+package com.example.athlekin.ui.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,11 +8,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.R
+import com.example.athlekin.ui.TrackingViewModel
 import com.example.athlekin.ui.components.TextInput
 
 
 @Composable
-fun EndWorkoutScreen(onToWorkoutsClicked : () -> Unit, onToTrackingClicked : () -> Unit, modifier: Modifier = Modifier, viewModel: WorkoutViewModel = viewModel()) {
+fun EndWorkoutScreen(onToWorkoutsClicked : () -> Unit, onToTrackingClicked : () -> Unit, modifier: Modifier = Modifier, viewModel: TrackingViewModel = viewModel()) {
     val inputWorkoutName = viewModel.inputWorkoutName
 
     Column() {

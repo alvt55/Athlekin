@@ -33,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.athlekin.R
 import com.example.athlekin.data.Exercise
+import com.example.athlekin.data.Workout
 
 
 @Composable
@@ -188,4 +189,34 @@ fun ExerciseItem(exercise : Exercise, modifier: Modifier = Modifier) {
 
 
 
+}
+
+@Composable
+fun WorkoutList(workoutsList: List<Workout>) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(16.dp)
+    ) {
+        items(workoutsList) { workout ->
+            // Workout name as a "header"
+            Text(
+                text = workout.name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            // Each exercise in this workout
+            workout.exercises.forEach { exercise ->
+                Text(
+                    text = "${exercise.name} - ${exercise.sets} sets x ${exercise.reps} reps",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
+                        .padding(8.dp)
+                )
+            }
+        }
+    }
 }
