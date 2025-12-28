@@ -96,9 +96,6 @@ class TrackingViewModel : ViewModel(){
         if (_uiState.value.exercises.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
             _uiState.update { TrackerUiState() }
             currExerciseState = CurrExerciseState()
-            Log.d(TRACKERVM_TAG, "Ended workout")
-        } else {
-            Log.d(TRACKERVM_TAG, "Failed to end workout")
         }
 
 
