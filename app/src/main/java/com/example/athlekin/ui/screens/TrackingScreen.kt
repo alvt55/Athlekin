@@ -28,7 +28,7 @@ fun TrackingScreen(
     onToWorkoutsClicked: () -> Unit,
     onToEndWorkout: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: TrackingViewModel = viewModel(),
+    viewModel: TrackingViewModel,
     contentType: AthelkinContentType
 ) {
 

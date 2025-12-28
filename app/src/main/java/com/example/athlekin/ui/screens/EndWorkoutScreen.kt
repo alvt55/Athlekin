@@ -15,7 +15,7 @@ import com.example.athlekin.ui.components.TextInput
 
 
 @Composable
-fun EndWorkoutScreen(onToWorkoutsClicked : () -> Unit, onToTrackingClicked : () -> Unit, modifier: Modifier = Modifier, viewModel: TrackingViewModel = viewModel()) {
+fun EndWorkoutScreen(onToWorkoutsClicked : () -> Unit, onToTrackingClicked : () -> Unit, modifier: Modifier = Modifier, viewModel: TrackingViewModel) {
 
     val workoutUiState by viewModel.uiState.collectAsState()
 
