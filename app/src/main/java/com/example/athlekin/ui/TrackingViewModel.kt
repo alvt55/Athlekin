@@ -1,13 +1,13 @@
 package com.example.athlekin.ui
 
+import android.R.attr.name
+import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 
 import com.example.athlekin.data.Exercise
-import com.example.athlekin.data.WorkoutUiState
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,64 +16,65 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 
+
+const val TRACKERVM_TAG: String = "TRACKER_VM"
+
+// the entire workout, what has ALREADY been added
+data class TrackerUiState(
+    val workoutName: String = "",
+    val exercises: List<Exercise> = emptyList(),
+)
+
+// the current exercise, NOT added yet
+data class CurrExerciseState(
+    val name: String = "",
+    val reps: Int = 1,
+    val sets: Int = 1,
+    val isEntryValid : Boolean = false,
+)
+
 class TrackingViewModel : ViewModel(){
 
 
     // not a compose state, therefore needs .collectAsState in the Compose layer
-    private val _uiState = MutableStateFlow(WorkoutUiState())
-    val uiState : StateFlow<WorkoutUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(TrackerUiState())
+    val uiState : StateFlow<TrackerUiState> = _uiState.asStateFlow()
 
-    var inputExerciseName by mutableStateOf("")
-        private set
-
-    var inputWorkoutName by mutableStateOf("")
-        private set
-
-    var inputReps by mutableIntStateOf(1)
-        private set
-    var inputSets by mutableIntStateOf(1)
+    var currExerciseState by mutableStateOf(CurrExerciseState())
         private set
 
 
-
-    var showDoExercise by mutableStateOf(false)
-        private set
-
-
-
-
-    fun updateExerciseName(name : String){
-        inputExerciseName = name
+    // updating the current exercise fields
+    fun updateCurrentExerciseState(details: CurrExerciseState) {
+        currExerciseState = details.copy(isEntryValid = validateInput(details))
     }
 
-
-    // TODO: change this to debounce callback
-    fun updateWorkoutName(name : String){
-        inputWorkoutName = name
-
-        _uiState.update { currentState ->
-            currentState.copy(
-                name = name
-            )
+    // validating the current exercise fields
+    fun validateInput(details : CurrExerciseState = currExerciseState) : Boolean {
+        return with(details) {
+            name.isNotBlank() &&
+                    reps > 0 &&
+                    sets > 0
         }
     }
 
 
+//    // TODO: change this to debounce callback
+    fun updateWorkoutName(name : String){
 
-    fun updateReps(reps : Int){
-        inputReps = reps
-    }
-
-    fun updateSets(sets : Int){
-        inputSets = sets
+        _uiState.update { currentState ->
+            currentState.copy(
+                workoutName = name
+            )
+        }
     }
 
 
     // given that reps, sets and exerciseName is filled, add exercise to UiState
     fun addExercise() {
 
-        if (inputReps > 0 && inputSets > 0 && inputExerciseName != "") {
-            val currExercise = Exercise(inputExerciseName, inputReps, inputSets)
+        if (currExerciseState.isEntryValid) {
+            val currExercise = Exercise(currExerciseState.name, currExerciseState.reps, currExerciseState.sets)
 
             _uiState.update { currentState ->
                 currentState.copy(
@@ -82,9 +83,7 @@ class TrackingViewModel : ViewModel(){
             }
 
             // reset input fields
-            updateExerciseName("")
-            updateSets(1)
-            updateReps(1)
+            currExerciseState = CurrExerciseState()
         }
 
 
@@ -94,31 +93,24 @@ class TrackingViewModel : ViewModel(){
     // given that the exercise list and name is not empty, reset the Ui data object
     fun endWorkout() {
 
-        if (_uiState.value.exercises.size != 0 && _uiState.value.name != "") {
-            _uiState.value = WorkoutUiState()
-            updateWorkoutName("")
+        if (_uiState.value.exercises.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
+            _uiState.update { TrackerUiState() }
+            currExerciseState = CurrExerciseState()
+            Log.d(TRACKERVM_TAG, "Ended workout")
+        } else {
+            Log.d(TRACKERVM_TAG, "Failed to end workout")
         }
+
+
     }
 
-    internal fun setUiStateForTest(state: WorkoutUiState) {
+    internal fun setUiStateForTest(state: TrackerUiState) {
         _uiState.value = state
     }
 
 
-    suspend fun runShowDoExercise() {
-
-        for (i in 1..5) {      // 1 to 5 inclusive
-            delay(200)
-            showDoExercise = true
-            delay(200)
-            showDoExercise = false
-        }
-
-    }
-
-
-
-
-
 
 }
+
+
+

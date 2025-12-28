@@ -139,8 +139,9 @@ fun AthelkinAppBar(
 
     TopAppBar(
         title = { Text(stringResource(currentScreen.title)) },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+
         ),
         modifier = modifier,
         navigationIcon = {
@@ -228,9 +229,7 @@ fun AthlekinApp(
 
 }
 
-private fun attemptEndWorkout() {
 
-}
 
 private fun shareWorkouts(context : Context, summary : String) {
 

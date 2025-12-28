@@ -9,91 +9,93 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import com.example.athlekin.R
-
 import com.example.athlekin.ui.TrackingViewModel
 import com.example.athlekin.ui.components.ExerciseList
 import com.example.athlekin.ui.components.NumberStepper
-
 import com.example.athlekin.ui.components.TextInput
 import com.example.athlekin.ui.utils.AthelkinContentType
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun TrackingScreen(
-    onToWorkoutsClicked : () -> Unit,
-    onToEndWorkout : () -> Unit,
+    onToWorkoutsClicked: () -> Unit,
+    onToEndWorkout: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TrackingViewModel = viewModel(),
-    contentType: AthelkinContentType) {
+    contentType: AthelkinContentType
+) {
 
-
-    val inputExerciseName = viewModel.inputExerciseName
-    val showDoExercise = viewModel.showDoExercise
-
-
-
-
+    // StateFlow screen state
     val workoutUiState by viewModel.uiState.collectAsState()
 
+    // Compose state from ViewModel
+    val currExerciseState = viewModel.currExerciseState
 
-
-    LaunchedEffect(Unit) {
-        launch{viewModel.runShowDoExercise()}
-    }
 
 
     Row(modifier = Modifier.fillMaxSize()) {
 
-
-
-        Column(modifier = modifier
-            .fillMaxSize()
-            .padding(dimensionResource(R.dimen.padding_small))
-            .weight(1f),
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(dimensionResource(R.dimen.padding_small))
+                .weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
 
-
+            // Exercise name
             TextInput(
-                value = inputExerciseName,
-                onValueChange = { viewModel.updateExerciseName(it) },
+                value = currExerciseState.name,
+                onValueChange = {
+                    viewModel.updateCurrentExerciseState(
+                        currExerciseState.copy(name = it)
+                    )
+                },
                 label = R.string.exercise_input
             )
 
-            Row () {
+            // Sets + Reps
+            Row {
                 NumberStepper(
-                    value = viewModel.inputSets,
-                    onValueChange = { viewModel.updateSets(it) },
-                    label="Sets"
+                    value = currExerciseState.sets,
+                    onValueChange = {
+                        viewModel.updateCurrentExerciseState(
+                            currExerciseState.copy(sets = it)
+                        )
+                    },
+                    label = "Sets"
                 )
+
                 NumberStepper(
-                    value = viewModel.inputReps,
-                    onValueChange = { viewModel.updateReps(it) },
-                    label="Reps"
+                    value = currExerciseState.reps,
+                    onValueChange = {
+                        viewModel.updateCurrentExerciseState(
+                            currExerciseState.copy(reps = it)
+                        )
+                    },
+                    label = "Reps"
                 )
             }
 
+
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { viewModel.addExercise()}
+                onClick = viewModel::addExercise,
+                enabled = currExerciseState.isEntryValid
             ) {
                 Text("Submit")
             }
 
 
-                ExerciseList(workoutUiState.exercises)
-
+            ExerciseList(workoutUiState.exercises)
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
@@ -109,7 +111,6 @@ fun TrackingScreen(
                 Text("To Workouts List")
             }
 
-            Text(showDoExercise.toString())
         }
 
         if (contentType == AthelkinContentType.TRACKER_WITH_WORKOUTS) {

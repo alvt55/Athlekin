@@ -5,6 +5,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.R
@@ -14,11 +16,13 @@ import com.example.athlekin.ui.components.TextInput
 
 @Composable
 fun EndWorkoutScreen(onToWorkoutsClicked : () -> Unit, onToTrackingClicked : () -> Unit, modifier: Modifier = Modifier, viewModel: TrackingViewModel = viewModel()) {
-    val inputWorkoutName = viewModel.inputWorkoutName
+
+    val workoutUiState by viewModel.uiState.collectAsState()
+
 
     Column() {
         TextInput(
-            value = inputWorkoutName,
+            value = workoutUiState.workoutName,
             onValueChange = { viewModel.updateWorkoutName(it) },
             label = R.string.workout_input
         )
