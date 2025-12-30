@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -16,11 +15,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.athlekin.ui.TrackingViewModel
-import com.example.athlekin.ui.screens.EndWorkoutScreen
-import com.example.athlekin.ui.screens.TrackingScreen
-import com.example.athlekin.ui.screens.WorkoutsScreen
+import com.example.athlekin.ui.tracker.TrackingViewModel
+import com.example.athlekin.ui.tracker.EndWorkoutScreen
+import com.example.athlekin.ui.tracker.TrackingScreen
+import com.example.athlekin.ui.workouts.WorkoutsScreen
 import com.example.athlekin.ui.utils.AthelkinContentType
+
 
 
 @Composable

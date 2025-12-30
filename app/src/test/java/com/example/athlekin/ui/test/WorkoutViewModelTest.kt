@@ -1,11 +1,9 @@
 package com.example.athlekin.ui.test
 
 import com.example.athlekin.data.Exercise
-import com.example.athlekin.ui.TrackingViewModel
-import com.example.athlekin.ui.TrackerUiState
-import com.example.athlekin.ui.CurrExerciseState
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
+import com.example.athlekin.ui.tracker.TrackingViewModel
+import com.example.athlekin.ui.tracker.TrackerUiState
+import com.example.athlekin.ui.tracker.CurrExerciseState
 import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Before

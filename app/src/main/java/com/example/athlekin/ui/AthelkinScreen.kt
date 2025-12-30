@@ -1,4 +1,4 @@
-package com.example.athlekin.ui.screens
+package com.example.athlekin.ui
 
 
 // // for the LLM input later

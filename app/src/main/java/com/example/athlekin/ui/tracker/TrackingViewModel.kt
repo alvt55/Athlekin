@@ -1,7 +1,5 @@
-package com.example.athlekin.ui
+package com.example.athlekin.ui.tracker
 
-import android.R.attr.name
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,7 +7,6 @@ import androidx.lifecycle.ViewModel
 
 import com.example.athlekin.data.Exercise
 
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

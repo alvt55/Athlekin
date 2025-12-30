@@ -1,4 +1,4 @@
-package com.example.athlekin.ui.screens
+package com.example.athlekin.ui.tracker
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -8,9 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.R
-import com.example.athlekin.ui.TrackingViewModel
 import com.example.athlekin.ui.components.TextInput
 
 

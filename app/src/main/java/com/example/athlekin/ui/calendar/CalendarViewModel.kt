@@ -1,16 +1,12 @@
-package com.example.athlekin
+package com.example.athlekin.ui.calendar
 
-import android.app.Application
 import android.content.Context
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.athlekin.data.CalendarRepo
-import com.example.athlekin.data.WorkoutsRepo
-import com.example.athlekin.ui.WorkoutsScreenViewModel
 import kotlinx.coroutines.launch
 
 class CalendarViewModel(
@@ -19,7 +15,7 @@ class CalendarViewModel(
 
     fun getAvailableSlots() {
 
-        viewModelScope.launch{
+        viewModelScope.launch {
             calendarRepo.queryCalendars()
         }
 

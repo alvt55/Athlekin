@@ -1,6 +1,7 @@
-package com.example.athlekin.ui.screens
+package com.example.athlekin.ui.workouts
 
 
+import android.Manifest
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -12,8 +13,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.athlekin.CalendarViewModel
-import com.example.athlekin.ui.WorkoutsScreenViewModel
+import com.example.athlekin.ui.calendar.CalendarViewModel
+import com.example.athlekin.ui.workouts.WorkoutsScreenViewModel
 import com.example.athlekin.ui.components.WorkoutList
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -36,7 +37,7 @@ fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) ->
     val calendarViewModel : CalendarViewModel = viewModel(factory= CalendarViewModel.factory(LocalContext.current))
 
     val calendarPermissionState = rememberPermissionState(
-        android.Manifest.permission.READ_CALENDAR
+        Manifest.permission.READ_CALENDAR
     )
 
     // Auto-request permission on first load

@@ -1,4 +1,4 @@
-package com.example.athlekin.ui.screens
+package com.example.athlekin.ui.tracker
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,9 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.R
-import com.example.athlekin.ui.TrackingViewModel
 import com.example.athlekin.ui.components.ExerciseList
 import com.example.athlekin.ui.components.NumberStepper
 import com.example.athlekin.ui.components.TextInput
