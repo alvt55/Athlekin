@@ -1,4 +1,4 @@
-package com.example.athlekin.ui.signup
+package com.example.athlekin.ui.createAccount
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SignUpViewModel @Inject constructor(
+class CreateAccountViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
