@@ -9,12 +9,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.athlekin.ui.signup.SignUpScreen
+import com.example.athlekin.ui.signup.SignUpViewModel
 import com.example.athlekin.ui.tracker.TrackingViewModel
 import com.example.athlekin.ui.tracker.EndWorkoutScreen
 import com.example.athlekin.ui.tracker.TrackingScreen
@@ -57,9 +60,15 @@ fun AthlekinApp(
 
         NavHost(
             navController = navController,
-            startDestination = AthelkinScreen.Tracking.name,
+            startDestination = AthelkinScreen.Signup.name,
             modifier = Modifier.Companion.padding(innerPadding)
         ) {
+            composable(route = AthelkinScreen.Signup.name) {
+                val viewModel = hiltViewModel<SignUpViewModel>()// USE NAVIGATION VIEW MODEL INSTEAD
+
+                SignUpScreen(openTrackerScreen = {navController.navigate(AthelkinScreen.Tracking.name)},
+                                viewModel = viewModel)
+            }
             composable(route = AthelkinScreen.Tracking.name) {
                 TrackingScreen(
                     onToWorkoutsClicked = { navController.navigate(AthelkinScreen.Workouts.name) },

@@ -27,9 +27,15 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
         auth.signInWithEmailAndPassword(email, password).await()
     }
 
-    suspend fun linkAccount(email: String, password: String) {
-        val credential = EmailAuthProvider.getCredential(email, password)
-        auth.currentUser!!.linkWithCredential(credential).await()
+    suspend fun createAccount(email: String, password: String) : Result<FirebaseUser> {
+//        val credential = EmailAuthProvider.getCredential(email, password)
+//        auth.currentUser!!.linkWithCredential(credential).await()
+        return try {
+            auth.signInWithEmailAndPassword(email, password).await()
+            Result.success(auth.currentUser!!)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     fun signOut() {

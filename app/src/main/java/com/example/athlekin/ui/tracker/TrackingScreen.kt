@@ -18,7 +18,9 @@ import com.example.athlekin.R
 import com.example.athlekin.ui.components.ExerciseList
 import com.example.athlekin.ui.components.NumberStepper
 import com.example.athlekin.ui.components.TextInput
+import com.example.athlekin.ui.signup.SignUpScreen
 import com.example.athlekin.ui.utils.AthelkinContentType
+import com.google.firebase.Firebase
 
 
 @Composable
