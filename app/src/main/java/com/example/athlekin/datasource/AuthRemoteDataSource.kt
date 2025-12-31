@@ -23,8 +23,15 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
         auth.signInAnonymously().await()
     }
 
-    suspend fun signIn(email: String, password: String) {
-        auth.signInWithEmailAndPassword(email, password).await()
+    suspend fun signIn(email: String, password: String) : Result<FirebaseUser> {
+
+        return try {
+            auth.signInWithEmailAndPassword(email, password).await()
+            Result.success(auth.currentUser!!)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
     }
 
     suspend fun createAccount(email: String, password: String) : Result<FirebaseUser> {

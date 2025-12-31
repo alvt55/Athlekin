@@ -1,32 +1,39 @@
 package com.example.athlekin.ui.tracker
 
+import android.R.attr.button
+import android.R.attr.onClick
+import android.R.attr.text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.athlekin.R
 import com.example.athlekin.ui.components.ExerciseList
 import com.example.athlekin.ui.components.NumberStepper
 import com.example.athlekin.ui.components.TextInput
-import com.example.athlekin.ui.signup.SignUpScreen
 import com.example.athlekin.ui.utils.AthelkinContentType
-import com.google.firebase.Firebase
 
 
 @Composable
 fun TrackingScreen(
     onToWorkoutsClicked: () -> Unit,
     onToEndWorkout: () -> Unit,
+    onToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TrackingViewModel,
     contentType: AthelkinContentType
@@ -50,6 +57,15 @@ fun TrackingScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
+
+            Button(
+                onClick = { viewModel.signOut()
+                            onToSignIn()},
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                shape = RoundedCornerShape(8.dp),
+            ) {
+                Text(text = "Sign Out")
+            }
 
             // Exercise name
             TextInput(
@@ -106,7 +122,7 @@ fun TrackingScreen(
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onToWorkoutsClicked
+                onClick = { onToWorkoutsClicked }
             ) {
                 Text("To Workouts List")
             }

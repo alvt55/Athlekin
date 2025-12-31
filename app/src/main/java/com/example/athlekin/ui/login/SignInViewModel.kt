@@ -1,4 +1,4 @@
-package com.example.athlekin.ui.createAccount
+package com.example.athlekin.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CreateAccountViewModel @Inject constructor(
+class SignInViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -22,28 +22,22 @@ class CreateAccountViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
-    fun createAccount(
+    fun signIn(
         email: String,
         password: String,
-        repeatPassword: String,
 //        showErrorSnackbar: (ErrorMessage) -> Unit
     ) {
 
 
-        if (password != repeatPassword) {
-            _errorMessage.value = "Passwords do not match"
-            return
-        }
-
         viewModelScope.launch {
-            val result = authRepository.createAccount(email, password)
+            val result = authRepository.signIn(email, password)
 
             result
                 .onSuccess {
                     _shouldGoTracker.value = true
                 }
                 .onFailure { error ->
-                    _errorMessage.value = error.message ?: "Sign up failed"
+                    _errorMessage.value = error.message ?: "Sign in failed"
                 }
         }
 

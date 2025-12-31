@@ -1,5 +1,7 @@
 package com.example.athlekin
 
+import SignInScreen
+import android.R.attr.name
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.padding
@@ -16,8 +18,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.athlekin.ui.signup.SignUpScreen
-import com.example.athlekin.ui.signup.SignUpViewModel
+import com.example.athlekin.ui.createAccount.CreateAccountScreen
+import com.example.athlekin.ui.createAccount.CreateAccountViewModel
+import com.example.athlekin.ui.login.SignInViewModel
 import com.example.athlekin.ui.tracker.TrackingViewModel
 import com.example.athlekin.ui.tracker.EndWorkoutScreen
 import com.example.athlekin.ui.tracker.TrackingScreen
@@ -60,19 +63,28 @@ fun AthlekinApp(
 
         NavHost(
             navController = navController,
-            startDestination = AthelkinScreen.Signup.name,
+            startDestination = AthelkinScreen.SignIn.name,
             modifier = Modifier.Companion.padding(innerPadding)
         ) {
-            composable(route = AthelkinScreen.Signup.name) {
-                val viewModel = hiltViewModel<SignUpViewModel>()// USE NAVIGATION VIEW MODEL INSTEAD
+            composable(route = AthelkinScreen.SignIn.name) {
+                val viewModel = hiltViewModel<SignInViewModel>()
 
-                SignUpScreen(openTrackerScreen = {navController.navigate(AthelkinScreen.Tracking.name)},
+                SignInScreen(openTrackerScreen = {navController.navigate(AthelkinScreen.Tracking.name)},
+                            onToCreateAccount = {navController.navigate(AthelkinScreen.CreateAccount.name)},
+                    viewModel = viewModel)
+            }
+            composable(route = AthelkinScreen.CreateAccount.name) {
+                val viewModel = hiltViewModel<CreateAccountViewModel>()
+
+                CreateAccountScreen(openTrackerScreen = {navController.navigate(AthelkinScreen.Tracking.name)},
+                        onToSignIn= {navController.navigate(AthelkinScreen.SignIn.name)},
                                 viewModel = viewModel)
             }
             composable(route = AthelkinScreen.Tracking.name) {
                 TrackingScreen(
                     onToWorkoutsClicked = { navController.navigate(AthelkinScreen.Workouts.name) },
                     onToEndWorkout = { navController.navigate(AthelkinScreen.EndWorkout.name) },
+                    onToSignIn = { navController.navigate(AthelkinScreen.SignIn.name) },
                     modifier = Modifier,
                     viewModel = trackingViewModel,
                     contentType = contentType

@@ -22,10 +22,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 
 @Composable
-fun SignUpScreen(
+fun CreateAccountScreen(
     openTrackerScreen: () -> Unit,
+    onToSignIn: () -> Unit,
 //    showErrorSnackbar: (ErrorMessage) -> Unit,
-    viewModel: SignUpViewModel
+    viewModel: CreateAccountViewModel
 ) {
     val shouldGoTracker by viewModel.shouldGoTracker.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
@@ -33,8 +34,9 @@ fun SignUpScreen(
     if (shouldGoTracker) {
         openTrackerScreen()
     } else {
-        SignUpScreenContent(
-            signUp = viewModel::signUp,
+        CreateAccountScreenContent(
+            signUp = viewModel::createAccount,
+            onToSignIn,
             errorMessage = errorMessage
         )
     }
@@ -45,7 +47,8 @@ fun SignUpScreen(
 
 
 @Composable
-fun SignUpScreenContent(signUp : (String, String, String) -> Unit, errorMessage : String?) {
+fun CreateAccountScreenContent(signUp : (String, String, String) -> Unit,
+                               onToSignIn: () -> Unit, errorMessage : String?) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -58,7 +61,7 @@ fun SignUpScreenContent(signUp : (String, String, String) -> Unit, errorMessage 
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(text = "Sign Up")
+        Text(text = "Create Account")
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -102,6 +105,13 @@ fun SignUpScreenContent(signUp : (String, String, String) -> Unit, errorMessage 
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Sign Up")
+        }
+
+        Button(
+            onClick = onToSignIn,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Sign In")
         }
     }
 }

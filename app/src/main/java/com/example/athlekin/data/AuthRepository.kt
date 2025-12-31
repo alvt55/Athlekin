@@ -1,6 +1,5 @@
 package com.example.athlekin.data
 
-import android.R.attr.password
 import com.example.athlekin.datasource.AuthRemoteDataSource
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
@@ -16,11 +15,11 @@ class AuthRepository @Inject constructor(
         authRemoteDataSource.createGuestAccount()
     }
 
-    suspend fun signIn(email: String, password: String) {
-        authRemoteDataSource.signIn(email, password)
+    suspend fun signIn(email: String, password: String) : Result<FirebaseUser>{
+        return authRemoteDataSource.signIn(email, password)
     }
 
-    suspend fun signUp(email: String, password: String) : Result<FirebaseUser>{
+    suspend fun createAccount(email: String, password: String) : Result<FirebaseUser>{
        return authRemoteDataSource.createAccount(email, password)
     }
 

@@ -4,14 +4,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.athlekin.data.AuthRepository
 
 import com.example.athlekin.data.Exercise
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-
+import javax.inject.Inject
 
 
 const val TRACKERVM_TAG: String = "TRACKER_VM"
@@ -30,7 +32,11 @@ data class CurrExerciseState(
     val isEntryValid : Boolean = false,
 )
 
-class TrackingViewModel : ViewModel(){
+
+@HiltViewModel
+class TrackingViewModel @Inject constructor(
+    private val authRepository: AuthRepository
+) : ViewModel() {
 
 
     // not a compose state, therefore needs .collectAsState in the Compose layer
@@ -96,6 +102,10 @@ class TrackingViewModel : ViewModel(){
         }
 
 
+    }
+
+    fun signOut() {
+        authRepository.signOut()
     }
 
     internal fun setUiStateForTest(state: TrackerUiState) {

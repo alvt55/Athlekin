@@ -1,5 +1,4 @@
-package com.example.athlekin.ui.login
-
+import android.R.attr.onClick
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,24 +17,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.athlekin.ui.signup.SignUpViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.athlekin.ui.createAccount.CreateAccountViewModel
+import com.example.athlekin.ui.login.SignInViewModel
 
 @Composable
 fun SignInScreen(
     openTrackerScreen: () -> Unit,
+    onToCreateAccount: () -> Unit,
 //    showErrorSnackbar: (ErrorMessage) -> Unit,
-    viewModel: SignUpViewModel = hiltViewModel<SignUpViewModel>()// USE NAVIGATION VIEW MODEL INSTEAD
+    viewModel: SignInViewModel
 ) {
-    val shouldRestartApp by viewModel.shouldGoTracker.collectAsStateWithLifecycle()
+    val shouldGoTracker by viewModel.shouldGoTracker.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
-
-    if (shouldRestartApp) {
+    if (shouldGoTracker) {
         openTrackerScreen()
     } else {
         SignInScreenContent(
-            signUp = viewModel::signUp,
+            signIn = viewModel::signIn,
+            onToCreateAccount,
+            errorMessage = errorMessage
         )
     }
 
@@ -45,11 +48,10 @@ fun SignInScreen(
 
 
 @Composable
-fun SignInScreenContent(signUp : (String, String, String) -> Unit) {
+fun SignInScreenContent(signIn : (String, String) -> Unit, onToCreateAccount : () -> Unit, errorMessage : String?) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var repeatPassword by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -58,7 +60,7 @@ fun SignInScreenContent(signUp : (String, String, String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        Text(text = "Sign Up")
+        Text(text = "Sign In")
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -81,23 +83,26 @@ fun SignInScreenContent(signUp : (String, String, String) -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = repeatPassword,
-            onValueChange = { repeatPassword = it },
-            label = { Text("Repeat Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth()
-        )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        errorMessage?.let {
+            Text(text = it)
+        }
 
         Button(
             onClick = {
-                signUp(email, password, repeatPassword)
+                signIn(email, password)
             },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Sign Up")
         }
+
+        Button(
+            onClick = onToCreateAccount,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Create Account")
+        }
     }
 }
+//
