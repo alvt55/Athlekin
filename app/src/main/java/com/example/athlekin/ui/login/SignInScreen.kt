@@ -20,7 +20,6 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.athlekin.ui.signup.SignUpScreenContent
 import com.example.athlekin.ui.signup.SignUpViewModel
 
 @Composable
@@ -29,7 +28,7 @@ fun SignInScreen(
 //    showErrorSnackbar: (ErrorMessage) -> Unit,
     viewModel: SignUpViewModel = hiltViewModel<SignUpViewModel>()// USE NAVIGATION VIEW MODEL INSTEAD
 ) {
-    val shouldRestartApp by viewModel.shouldRestartApp.collectAsStateWithLifecycle()
+    val shouldRestartApp by viewModel.shouldGoTracker.collectAsStateWithLifecycle()
 
 
     if (shouldRestartApp) {

@@ -15,9 +15,12 @@ class SignUpViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _shouldRestartApp = MutableStateFlow(false)
-    val shouldRestartApp: StateFlow<Boolean>
-        get() = _shouldRestartApp.asStateFlow()
+    private val _shouldGoTracker = MutableStateFlow(false)
+    val shouldGoTracker: StateFlow<Boolean>
+        get() = _shouldGoTracker.asStateFlow()
+
+    private val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
     fun signUp(
         email: String,
@@ -40,9 +43,16 @@ class SignUpViewModel @Inject constructor(
 //            return
 //        }
 
-        viewModelScope.launch{
-            authRepository.signUp(email, password)
-            _shouldRestartApp.value = true
+        viewModelScope.launch {
+            val result = authRepository.signUp(email, password)
+
+            result
+                .onSuccess {
+                    _shouldGoTracker.value = true
+                }
+                .onFailure { error ->
+                    _errorMessage.value = error.message ?: "Sign up failed"
+                }
         }
 
 
