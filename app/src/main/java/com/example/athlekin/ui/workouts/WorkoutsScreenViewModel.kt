@@ -23,4 +23,6 @@ class WorkoutsScreenViewModel @Inject constructor(
 ) : ViewModel() {
 
 
+    val workouts = workoutsRemoteDataSource.getWorkouts(authRepository.currentUserIdFlow)
+
 }

@@ -24,7 +24,7 @@ import com.example.athlekin.ui.tracker.TrackingViewModel
 import com.example.athlekin.ui.tracker.TrackingScreen
 import com.example.athlekin.ui.workouts.WorkoutsScreen
 import com.example.athlekin.ui.utils.AthelkinContentType
-
+import com.example.athlekin.ui.workouts.WorkoutsScreenViewModel
 
 
 @Composable
@@ -89,13 +89,15 @@ fun AthlekinApp(
             }
             composable(route = AthelkinScreen.Workouts.name) {
                 val context = LocalContext.current
-                // Unfinished screen
+                val viewModel = hiltViewModel<WorkoutsScreenViewModel>()
+
                 WorkoutsScreen(
                     onToTrackingClicked = { navController.navigate(AthelkinScreen.Tracking.name) },
                     onShareButton = { summary: String ->
                         shareWorkouts(context, summary)
                     },
-                    modifier = Modifier
+                    modifier = Modifier,
+                    viewModel = viewModel,
                 )
             }
 
