@@ -94,7 +94,7 @@ fun SignInScreenContent(signIn : (String, String) -> Unit, onToCreateAccount : (
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Sign Up")
+            Text("Sign In")
         }
 
         Button(
