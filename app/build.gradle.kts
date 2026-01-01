@@ -90,6 +90,9 @@ dependencies {
     implementation("com.firebaseui:firebase-ui-auth:9.0.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
 
+    // firestore
+    implementation("com.google.firebase:firebase-firestore")
+
 
 
 

@@ -1,26 +1,26 @@
 package com.example.athlekin.data
 
-
+import com.example.athlekin.datasource.WorkoutsRemoteDataSource
+import com.example.athlekin.model.Exercise
+import com.example.athlekin.model.Workout
+import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
 interface WorkoutPageRepo {
-    suspend fun getWorkouts(): List<Workout>
+    fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<Workout>>
+    suspend fun createWorkout(workout: Workout) : String
 }
 
-class WorkoutsRepo : WorkoutPageRepo{
+class WorkoutsRepo @Inject constructor(
+    private val workoutsRemoteDataSource: WorkoutsRemoteDataSource
+) : WorkoutPageRepo{
 
-    // test data, will use external source later
-
-    val w1 = Workout("work1",
-        listOf(Exercise("Test1", 1, 2),
-                            Exercise("Test2", 3, 4)))
-
-    val w2 = Workout("work2",
-        listOf(Exercise("Test3", 10, 2),
-            Exercise("Test4", 100, 4)))
-
-    val workouts = listOf(w1, w2)
-
-    override suspend fun getWorkouts(): List<Workout> {
-        return workouts
+    override fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<Workout>> {
+        return workoutsRemoteDataSource.getWorkouts(currentUserIdFlow)
     }
+
+    override suspend fun createWorkout(workout: Workout) : String {
+        return workoutsRemoteDataSource.createWorkout(workout)
+    }
+
 }

@@ -28,10 +28,10 @@ const val WORKOUTS_SCREEN_TAG: String = "CALENDAR"
 // list of exercises for the current workout
 fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) -> Unit, modifier: Modifier = Modifier) {
 
-    val workoutsViewModel : WorkoutsScreenViewModel = viewModel(factory= WorkoutsScreenViewModel.Factory)
-    val workoutsList by workoutsViewModel.workouts.collectAsState()
+//    val workoutsViewModel : WorkoutsScreenViewModel = viewModel(factory= WorkoutsScreenViewModel.Factory)
+//    val workoutsList by workoutsViewModel.workouts.collectAsState()
 
-    Log.i(WORKOUTS_SCREEN_TAG, workoutsList.toString())
+//    Log.i(WORKOUTS_SCREEN_TAG, workoutsList.toString())
 
 
     val calendarViewModel : CalendarViewModel = viewModel(factory= CalendarViewModel.factory(LocalContext.current))
@@ -57,20 +57,20 @@ fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) ->
         }
     }
 
-
-
-    Column() {
-
-        WorkoutList(workoutsList)
-        Button(onClick=onToTrackingClicked) {
-            Text("To Tracking")
-        }
-
-        // share button placeholder
-        Button(onClick= { onShareButton("test summary to share") }) {
-            Text("Share Workouts")
-        }
-    }
+//
+//
+//    Column() {
+//
+//        WorkoutList(workoutsList)
+//        Button(onClick=onToTrackingClicked) {
+//            Text("To Tracking")
+//        }
+//
+//        // share button placeholder
+//        Button(onClick= { onShareButton("test summary to share") }) {
+//            Text("Share Workouts")
+//        }
+//    }
 }
 
 

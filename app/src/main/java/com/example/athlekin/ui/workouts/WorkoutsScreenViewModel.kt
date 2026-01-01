@@ -5,37 +5,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
-import com.example.athlekin.data.Workout
+import com.example.athlekin.data.AuthRepository
+import com.example.athlekin.model.Workout
 import com.example.athlekin.data.WorkoutsRepo
+import com.example.athlekin.datasource.WorkoutsRemoteDataSource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-
-class WorkoutsScreenViewModel(
-    private val workoutsRepo: WorkoutsRepo
-) : ViewModel(){
-
-    private val _workouts = MutableStateFlow<List<Workout>>(emptyList())
-    val workouts = _workouts.asStateFlow()
+import javax.inject.Inject
 
 
-    init {
-        loadWorkouts()
-    }
-
-     fun loadWorkouts() {
-        viewModelScope.launch {
-            _workouts.value = workoutsRepo.getWorkouts()
-        }
-    }
+@HiltViewModel
+class WorkoutsScreenViewModel @Inject constructor(
+    private val authRepository: AuthRepository,
+    private val workoutsRemoteDataSource: WorkoutsRemoteDataSource
+) : ViewModel() {
 
 
-
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                WorkoutsScreenViewModel(workoutsRepo = WorkoutsRepo())
-            }
-        }
-    }
 }

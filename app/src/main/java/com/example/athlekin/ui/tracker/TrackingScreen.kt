@@ -1,8 +1,5 @@
 package com.example.athlekin.ui.tracker
 
-import android.R.attr.button
-import android.R.attr.onClick
-import android.R.attr.text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.athlekin.R
 import com.example.athlekin.ui.components.ExerciseList
 import com.example.athlekin.ui.components.NumberStepper
@@ -32,7 +28,6 @@ import com.example.athlekin.ui.utils.AthelkinContentType
 @Composable
 fun TrackingScreen(
     onToWorkoutsClicked: () -> Unit,
-    onToEndWorkout: () -> Unit,
     onToSignIn: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TrackingViewModel,
@@ -113,19 +108,36 @@ fun TrackingScreen(
 
             ExerciseList(workoutUiState.exercises)
 
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = onToEndWorkout
-            ) {
-                Text("Finish")
+
+            // end workout section
+            Column() {
+                TextInput(
+                    value = workoutUiState.workoutName,
+                    onValueChange = { viewModel.updateWorkoutName(it) },
+                    label = R.string.workout_input
+                )
+                Button(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { viewModel.endWorkout() }
+                ) {
+                    Text("End Workout")
+                }
+
+                if (workoutUiState.errorMessage != null) {
+                    Text("${workoutUiState.errorMessage}")
+                }
+
             }
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onToWorkoutsClicked }
+                onClick = onToWorkoutsClicked
             ) {
                 Text("To Workouts List")
             }
+
+
+
 
         }
 

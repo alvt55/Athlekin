@@ -1,7 +1,6 @@
 package com.example.athlekin
 
 import SignInScreen
-import android.R.attr.name
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.padding
@@ -22,7 +21,6 @@ import com.example.athlekin.ui.createAccount.CreateAccountScreen
 import com.example.athlekin.ui.createAccount.CreateAccountViewModel
 import com.example.athlekin.ui.login.SignInViewModel
 import com.example.athlekin.ui.tracker.TrackingViewModel
-import com.example.athlekin.ui.tracker.EndWorkoutScreen
 import com.example.athlekin.ui.tracker.TrackingScreen
 import com.example.athlekin.ui.workouts.WorkoutsScreen
 import com.example.athlekin.ui.utils.AthelkinContentType
@@ -83,19 +81,10 @@ fun AthlekinApp(
             composable(route = AthelkinScreen.Tracking.name) {
                 TrackingScreen(
                     onToWorkoutsClicked = { navController.navigate(AthelkinScreen.Workouts.name) },
-                    onToEndWorkout = { navController.navigate(AthelkinScreen.EndWorkout.name) },
                     onToSignIn = { navController.navigate(AthelkinScreen.SignIn.name) },
                     modifier = Modifier,
                     viewModel = trackingViewModel,
                     contentType = contentType
-                )
-            }
-            composable(route = AthelkinScreen.EndWorkout.name) {
-                EndWorkoutScreen(
-                    onToWorkoutsClicked = { navController.navigate(AthelkinScreen.Workouts.name) },
-                    onToTrackingClicked = { navController.navigate(AthelkinScreen.Tracking.name) },
-                    viewModel = trackingViewModel,
-                    modifier = Modifier
                 )
             }
             composable(route = AthelkinScreen.Workouts.name) {

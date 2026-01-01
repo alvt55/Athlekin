@@ -1,18 +1,24 @@
 package com.example.athlekin.ui.tracker
 
+import android.R.attr.name
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.athlekin.data.AuthRepository
+import com.example.athlekin.data.WorkoutsRepo
+import com.example.athlekin.datasource.WorkoutsRemoteDataSource
 
-import com.example.athlekin.data.Exercise
+import com.example.athlekin.model.Exercise
+import com.example.athlekin.model.Workout
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -22,6 +28,7 @@ const val TRACKERVM_TAG: String = "TRACKER_VM"
 data class TrackerUiState(
     val workoutName: String = "",
     val exercises: List<Exercise> = emptyList(),
+    val errorMessage: String? = null
 )
 
 // the current exercise, NOT added yet
@@ -35,7 +42,8 @@ data class CurrExerciseState(
 
 @HiltViewModel
 class TrackingViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val workoutsRepo: WorkoutsRepo
 ) : ViewModel() {
 
 
@@ -95,13 +103,38 @@ class TrackingViewModel @Inject constructor(
     // TODO: complete this when data source is added
     // given that the exercise list and name is not empty, reset the Ui data object
     fun endWorkout() {
+        val ownerId = authRepository.currentUser?.uid
 
-        if (_uiState.value.exercises.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
-            _uiState.update { TrackerUiState() }
-            currExerciseState = CurrExerciseState()
+        if (ownerId.isNullOrBlank()) {
+            _uiState.update { it.copy(errorMessage = "You must be signed in to save a workout.") }
+            return
         }
 
+        if (_uiState.value.exercises.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
+            // add workout based on UI fields
+            val workoutToAdd = Workout(
+                ownerId = ownerId,
+                name = _uiState.value.workoutName,
+                exercises = _uiState.value.exercises
+            )
 
+            viewModelScope.launch {
+                try {
+                    workoutsRepo.createWorkout(workoutToAdd)
+                    // reset UI state after adding
+                    _uiState.update { TrackerUiState() }
+                    currExerciseState = CurrExerciseState()
+                } catch (e: Exception) {
+                    // error saving workout
+                    _uiState.update { it.copy(errorMessage = "Failed to save workout: ${e.message}") }
+                }
+            }
+
+
+        } else {
+            // Missing workout name or exercises
+            _uiState.update { it.copy(errorMessage = "Please enter a workout name and add at least one exercise.") }
+        }
     }
 
     fun signOut() {

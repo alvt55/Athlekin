@@ -110,7 +110,6 @@ fun ExpandedScreenPreview() {
 
 enum class AthelkinScreen(@StringRes val title: Int) {
     Tracking(title = R.string.tracking_page),
-    EndWorkout(title = R.string.end_page),
     Workouts(title = R.string.workouts_page),
     CreateAccount(title = R.string.create_account),
     SignIn(title = R.string.signin)
