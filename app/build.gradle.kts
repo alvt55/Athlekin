@@ -76,6 +76,7 @@ dependencies {
     ksp("com.google.dagger:hilt-compiler:2.57.2")
     implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
+
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
@@ -92,6 +93,12 @@ dependencies {
 
     // firestore
     implementation("com.google.firebase:firebase-firestore")
+
+
+    // room
+    ksp("androidx.room:room-compiler:2.6.1")
+    implementation(libs.androidx.room.ktx)
+    implementation("androidx.room:room-runtime:2.6.1")
 
 
 

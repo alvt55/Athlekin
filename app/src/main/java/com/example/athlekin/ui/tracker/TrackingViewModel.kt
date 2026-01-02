@@ -1,6 +1,5 @@
 package com.example.athlekin.ui.tracker
 
-import android.R.attr.name
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,10 +7,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.WorkoutsRepo
-import com.example.athlekin.datasource.WorkoutsRemoteDataSource
 
 import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.Workout
+import com.example.athlekin.room.OfflineExercisesRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +42,8 @@ data class CurrExerciseState(
 @HiltViewModel
 class TrackingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val workoutsRepo: WorkoutsRepo
+    private val workoutsRepo: WorkoutsRepo,
+    private val offlineExercisesRepo: OfflineExercisesRepo
 ) : ViewModel() {
 
 
@@ -82,6 +82,7 @@ class TrackingViewModel @Inject constructor(
 
 
     // given that reps, sets and exerciseName is filled, add exercise to UiState
+    // add this exercise to the offline_db Room DB for local persistence
     fun addExercise() {
 
         if (currExerciseState.isEntryValid) {
@@ -93,6 +94,12 @@ class TrackingViewModel @Inject constructor(
                 )
             }
 
+            viewModelScope.launch {
+                offlineExercisesRepo.createExercise(com.example.athlekin.room.ExerciseEntity(name = currExercise.name, reps = currExercise.reps, sets = currExercise.sets))
+            }
+
+
+
             // reset input fields
             currExerciseState = CurrExerciseState()
         }
@@ -100,7 +107,6 @@ class TrackingViewModel @Inject constructor(
 
     }
 
-    // TODO: complete this when data source is added
     // given that the exercise list and name is not empty, reset the Ui data object
     fun endWorkout() {
         val ownerId = authRepository.currentUser?.uid
