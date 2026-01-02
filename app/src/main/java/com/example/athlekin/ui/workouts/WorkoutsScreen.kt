@@ -2,6 +2,7 @@ package com.example.athlekin.ui.workouts
 
 
 import android.Manifest
+import android.R.attr.text
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -34,7 +35,7 @@ fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) ->
 
 
 
-
+    val errorMessage = viewModel.errorMessage
     val calendarViewModel : CalendarViewModel = viewModel(factory= CalendarViewModel.factory(LocalContext.current))
 
     val calendarPermissionState = rememberPermissionState(
@@ -62,7 +63,12 @@ fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) ->
 
     Column() {
 
-        WorkoutList(workouts)
+        if (errorMessage.isNotBlank()) {
+            Text(errorMessage)
+        }
+
+
+        WorkoutList(workouts, onDeleteClick = viewModel::deleteWorkout)
         Button(onClick=onToTrackingClicked) {
             Text("To Tracking")
         }

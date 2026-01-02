@@ -27,7 +27,9 @@ class WorkoutsRemoteDataSource @Inject constructor(
         return firestore.collection(WORKOUTS_COLLECTION).add(workout).await().id
     }
 
-
+    suspend fun delete(id: String) {
+        firestore.collection(WORKOUTS_COLLECTION).document(id).delete().await()
+    }
 
 
     companion object {

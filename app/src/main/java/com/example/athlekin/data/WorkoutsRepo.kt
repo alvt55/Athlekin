@@ -9,6 +9,8 @@ import javax.inject.Inject
 interface WorkoutPageRepo {
     fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<Workout>>
     suspend fun createWorkout(workout: Workout) : String
+
+    suspend fun deleteWorkout(id: String)
 }
 
 class WorkoutsRepo @Inject constructor(
@@ -22,5 +24,11 @@ class WorkoutsRepo @Inject constructor(
     override suspend fun createWorkout(workout: Workout) : String {
         return workoutsRemoteDataSource.createWorkout(workout)
     }
+
+    override suspend fun deleteWorkout(id: String) {
+         workoutsRemoteDataSource.delete(id)
+    }
+
+
 
 }

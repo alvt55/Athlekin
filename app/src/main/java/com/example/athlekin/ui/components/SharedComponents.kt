@@ -1,5 +1,6 @@
 package com.example.athlekin.ui.components
 
+import android.R.attr.onClick
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,8 +42,8 @@ import com.example.athlekin.model.Workout
 // exercise input field
 fun TextInput(
     @StringRes label: Int,
-    value : String,
-    onValueChange : (String) -> Unit,
+    value: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -95,25 +97,27 @@ fun NumberStepper(
 }
 
 
-
-
 @Composable
 // list of exercises for the current workout
-fun ExerciseList(exerciseList : List<Exercise>, modifier: Modifier = Modifier) {
+fun ExerciseList(exerciseList: List<Exercise>, modifier: Modifier = Modifier) {
 
     Column(modifier = modifier.fillMaxHeight(0.3f)) {
         // header
-        Row(modifier = modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly) {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
 
             ProvideTextStyle(
                 value = MaterialTheme.typography.displayMedium
             ) {
-                Text(text= stringResource(R.string.reps),
+                Text(
+                    text = stringResource(R.string.reps),
                     modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Left)
+                    textAlign = TextAlign.Left
+                )
                 Text(text = stringResource(R.string.sets), modifier = Modifier.weight(1f))
                 Text(text = stringResource(R.string.exercise), modifier = Modifier.weight(3f))
             }
@@ -146,7 +150,7 @@ private fun ExpandButton(
     IconButton(
         onClick = onClick,
         modifier = modifier
-    ){
+    ) {
         Icon(
             imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
             contentDescription = stringResource(R.string.expand_button_content_description),
@@ -158,17 +162,24 @@ private fun ExpandButton(
 
 @Composable
 // ui for an exercise item
-fun ExerciseItem(exercise : Exercise, modifier: Modifier = Modifier) {
+fun ExerciseItem(exercise: Exercise, modifier: Modifier = Modifier) {
 
-    var expanded by remember {mutableStateOf(false)}
+    var expanded by remember { mutableStateOf(false) }
 
     Column() {
         Card(modifier = modifier) {
-            Row(modifier = modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Text(text= exercise.reps.toString(), modifier = Modifier.weight(1f), textAlign = TextAlign.Left)
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = exercise.reps.toString(),
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Left
+                )
                 Text(text = exercise.sets.toString(), modifier = Modifier.weight(1f))
-                Text(text=exercise.name, modifier = Modifier.weight(3f))
-                ExpandButton(expanded = expanded, onClick = {expanded = !expanded})
+                Text(text = exercise.name, modifier = Modifier.weight(3f))
+                ExpandButton(expanded = expanded, onClick = { expanded = !expanded })
 
             }
 
@@ -188,34 +199,49 @@ fun ExerciseItem(exercise : Exercise, modifier: Modifier = Modifier) {
     }
 
 
-
 }
 
 @Composable
-fun WorkoutList(workoutsList: List<Workout>) {
+fun WorkoutList(workoutsList: List<Workout>, onDeleteClick: (String) -> Unit) {
     LazyColumn(
         modifier = Modifier
             .padding(16.dp)
+            .fillMaxWidth()
     ) {
         items(workoutsList) { workout ->
             // Workout name as a "header"
-            Text(
-                text = workout.name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                style = MaterialTheme.typography.titleMedium
-            )
 
-            // Each exercise in this workout
-            workout.exercises.forEach { exercise ->
-                Text(
-                    text = "${exercise.name} - ${exercise.sets} sets x ${exercise.reps} reps",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
-                        .padding(8.dp)
-                )
+
+                Column() {
+                    Text(
+                        text = workout.name,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+
+                    // Each exercise in this workout
+                    workout.exercises.forEach { exercise ->
+
+                        Text(
+                            text = "${exercise.name} - ${exercise.sets} sets x ${exercise.reps} reps",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
+                                .padding(8.dp)
+                        )
+                    }
+
+                    Button(
+                        onClick = { onDeleteClick(workout.id) }
+                    ) {
+                        Text("Delete")
+                    }
+
+
+
+
             }
         }
     }
