@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import com.example.athlekin.R
 import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.Workout
+import com.example.athlekin.room.ExerciseEntity
 
 
 @Composable

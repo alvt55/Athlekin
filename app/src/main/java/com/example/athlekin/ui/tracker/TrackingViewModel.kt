@@ -10,12 +10,17 @@ import com.example.athlekin.data.WorkoutsRepo
 
 import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.Workout
+import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,7 +31,6 @@ const val TRACKERVM_TAG: String = "TRACKER_VM"
 // the entire workout, what has ALREADY been added
 data class TrackerUiState(
     val workoutName: String = "",
-    val exercises: List<Exercise> = emptyList(),
     val errorMessage: String? = null
 )
 
@@ -35,7 +39,7 @@ data class CurrExerciseState(
     val name: String = "",
     val reps: Int = 1,
     val sets: Int = 1,
-    val isEntryValid : Boolean = false,
+    val isEntryValid: Boolean = false,
 )
 
 
@@ -49,10 +53,21 @@ class TrackingViewModel @Inject constructor(
 
     // not a compose state, therefore needs .collectAsState in the Compose layer
     private val _uiState = MutableStateFlow(TrackerUiState())
-    val uiState : StateFlow<TrackerUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<TrackerUiState> = _uiState.asStateFlow()
 
     var currExerciseState by mutableStateOf(CurrExerciseState())
         private set
+
+
+    val roomExercises: StateFlow<List<Exercise>> =
+        offlineExercisesRepo
+            .getAllExercisesStream()
+            .map { list -> list.map { it.toExercise() } }  // map each entity to model
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = emptyList()
+            )
 
 
     // updating the current exercise fields
@@ -61,7 +76,7 @@ class TrackingViewModel @Inject constructor(
     }
 
     // validating the current exercise fields
-    fun validateInput(details : CurrExerciseState = currExerciseState) : Boolean {
+    fun validateInput(details: CurrExerciseState = currExerciseState): Boolean {
         return with(details) {
             name.isNotBlank() &&
                     reps > 0 &&
@@ -70,8 +85,8 @@ class TrackingViewModel @Inject constructor(
     }
 
 
-//    // TODO: change this to debounce callback
-    fun updateWorkoutName(name : String){
+    //    // TODO: change this to debounce callback
+    fun updateWorkoutName(name: String) {
 
         _uiState.update { currentState ->
             currentState.copy(
@@ -86,18 +101,18 @@ class TrackingViewModel @Inject constructor(
     fun addExercise() {
 
         if (currExerciseState.isEntryValid) {
-            val currExercise = Exercise(currExerciseState.name, currExerciseState.reps, currExerciseState.sets)
+            val currExercise = ExerciseEntity(
+                name = currExerciseState.name,
+                reps = currExerciseState.reps,
+                sets = currExerciseState.sets
+            )
 
-            _uiState.update { currentState ->
-                currentState.copy(
-                    exercises = currentState.exercises + currExercise
-                )
-            }
 
             viewModelScope.launch {
-                offlineExercisesRepo.createExercise(com.example.athlekin.room.ExerciseEntity(name = currExercise.name, reps = currExercise.reps, sets = currExercise.sets))
+                offlineExercisesRepo.createExercise(
+                    currExercise
+                )
             }
-
 
 
             // reset input fields
@@ -116,18 +131,21 @@ class TrackingViewModel @Inject constructor(
             return
         }
 
-        if (_uiState.value.exercises.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
+        if (roomExercises.value.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
             // add workout based on UI fields
             val workoutToAdd = Workout(
                 ownerId = ownerId,
                 name = _uiState.value.workoutName,
-                exercises = _uiState.value.exercises
+                exercises = roomExercises.value.map {
+                    Exercise(it.name, it.reps, it.sets)
+                }
             )
 
             viewModelScope.launch {
                 try {
                     workoutsRepo.createWorkout(workoutToAdd)
                     // reset UI state after adding
+                    offlineExercisesRepo.deleteAllExercises()
                     _uiState.update { TrackerUiState() }
                     currExerciseState = CurrExerciseState()
                 } catch (e: Exception) {
@@ -151,6 +169,13 @@ class TrackingViewModel @Inject constructor(
         _uiState.value = state
     }
 
+    fun ExerciseEntity.toExercise(): Exercise {
+        return Exercise(
+            name = this.name,
+            reps = this.reps,
+            sets = this.sets
+        )
+    }
 
 
 }

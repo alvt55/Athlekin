@@ -8,6 +8,8 @@ import androidx.room.RoomDatabase
 abstract class ExerciseDatabase : RoomDatabase() {
 
     abstract fun exerciseDao(): ExerciseDao
+
+
 //
 //    companion object {
 //        @Volatile
