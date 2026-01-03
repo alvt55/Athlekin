@@ -1,6 +1,5 @@
 package com.example.athlekin.ui.components
 
-import android.R.attr.onClick
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -36,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import com.example.athlekin.R
 import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.Workout
-import com.example.athlekin.room.ExerciseEntity
 
 
 @Composable
@@ -100,7 +98,9 @@ fun NumberStepper(
 
 @Composable
 // list of exercises for the current workout
-fun ExerciseList(exerciseList: List<Exercise>, modifier: Modifier = Modifier) {
+fun ExerciseList(exerciseList: List<Exercise>,
+                 onExerciseDelete : (Int) -> Unit,
+                 modifier: Modifier = Modifier) {
 
     Column(modifier = modifier.fillMaxHeight(0.3f)) {
         // header
@@ -130,6 +130,7 @@ fun ExerciseList(exerciseList: List<Exercise>, modifier: Modifier = Modifier) {
             items(exerciseList) {
                 ExerciseItem(
                     exercise = it,
+                    onExerciseDelete = onExerciseDelete,
 //                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
                     modifier = Modifier.padding(10.dp)
                 )
@@ -163,7 +164,7 @@ private fun ExpandButton(
 
 @Composable
 // ui for an exercise item
-fun ExerciseItem(exercise: Exercise, modifier: Modifier = Modifier) {
+fun ExerciseItem(exercise: Exercise, onExerciseDelete: (Int) -> Unit,  modifier: Modifier = Modifier) {
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -193,6 +194,11 @@ fun ExerciseItem(exercise: Exercise, modifier: Modifier = Modifier) {
                         text = "Total volume: ${exercise.reps * exercise.sets}",
                         style = MaterialTheme.typography.labelSmall
                     )
+                    Button(
+                        onClick={onExerciseDelete(exercise.roomId)}
+                    ) {
+                        Text("delete")
+                    }
                 }
             }
 

@@ -12,8 +12,8 @@ data class Workout(
 )
 
 
-// TODO: add this firebase later, form relationship with Workout collection
 data class Exercise(
+    val roomId: Int = 0,
     val name: String = "",
     val reps: Int = 1,
     val sets: Int = 1,

@@ -11,9 +11,7 @@ class AuthRepository @Inject constructor(
     val currentUser: FirebaseUser? = authRemoteDataSource.currentUser
     val currentUserIdFlow: Flow<String?> = authRemoteDataSource.currentUserIdFlow
 
-    suspend fun createGuestAccount() {
-        authRemoteDataSource.createGuestAccount()
-    }
+
 
     suspend fun signIn(email: String, password: String) : Result<FirebaseUser>{
         return authRemoteDataSource.signIn(email, password)
@@ -27,7 +25,5 @@ class AuthRepository @Inject constructor(
         authRemoteDataSource.signOut()
     }
 
-    suspend fun deleteAccount() {
-        authRemoteDataSource.deleteAccount()
-    }
+
 }

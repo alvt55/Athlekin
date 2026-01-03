@@ -13,7 +13,6 @@ import com.example.athlekin.model.Workout
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,13 +27,13 @@ import javax.inject.Inject
 
 const val TRACKERVM_TAG: String = "TRACKER_VM"
 
-// the entire workout, what has ALREADY been added
+// state about the entire workout
 data class TrackerUiState(
     val workoutName: String = "",
     val errorMessage: String? = null
 )
 
-// the current exercise, NOT added yet
+// the current exercise fields, NOT added yet
 data class CurrExerciseState(
     val name: String = "",
     val reps: Int = 1,
@@ -50,19 +49,17 @@ class TrackingViewModel @Inject constructor(
     private val offlineExercisesRepo: OfflineExercisesRepo
 ) : ViewModel() {
 
-
-    // not a compose state, therefore needs .collectAsState in the Compose layer
     private val _uiState = MutableStateFlow(TrackerUiState())
     val uiState: StateFlow<TrackerUiState> = _uiState.asStateFlow()
 
     var currExerciseState by mutableStateOf(CurrExerciseState())
         private set
 
-
-    val roomExercises: StateFlow<List<Exercise>> =
+    // Exercise objects, created from the room database ExerciseEntity -> Exercise
+    val exercises: StateFlow<List<Exercise>> =
         offlineExercisesRepo
             .getAllExercisesStream()
-            .map { list -> list.map { it.toExercise() } }  // map each entity to model
+            .map { list -> list.map { it.toExercise() } }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
@@ -85,7 +82,7 @@ class TrackingViewModel @Inject constructor(
     }
 
 
-    //    // TODO: change this to debounce callback
+    // update workout name field
     fun updateWorkoutName(name: String) {
 
         _uiState.update { currentState ->
@@ -122,7 +119,8 @@ class TrackingViewModel @Inject constructor(
 
     }
 
-    // given that the exercise list and name is not empty, reset the Ui data object
+    // if user is authenticated, exercise list and name is not empty, add workout to Firestore
+    //
     fun endWorkout() {
         val ownerId = authRepository.currentUser?.uid
 
@@ -131,20 +129,21 @@ class TrackingViewModel @Inject constructor(
             return
         }
 
-        if (roomExercises.value.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
+        if (exercises.value.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
             // add workout based on UI fields
             val workoutToAdd = Workout(
                 ownerId = ownerId,
                 name = _uiState.value.workoutName,
-                exercises = roomExercises.value.map {
-                    Exercise(it.name, it.reps, it.sets)
+                exercises = exercises.value.map {
+                    Exercise(name=it.name, reps=it.reps, sets=it.sets) // room_id set to 0
                 }
             )
 
             viewModelScope.launch {
                 try {
                     workoutsRepo.createWorkout(workoutToAdd)
-                    // reset UI state after adding
+
+                    // reset UI state and local storage after adding
                     offlineExercisesRepo.deleteAllExercises()
                     _uiState.update { TrackerUiState() }
                     currExerciseState = CurrExerciseState()
@@ -161,6 +160,14 @@ class TrackingViewModel @Inject constructor(
         }
     }
 
+    // delete exercise from Room based on room_id
+    fun deleteExercise(roomId : Int) {
+        viewModelScope.launch {
+            offlineExercisesRepo.deleteExerciseById(roomId)
+        }
+    }
+
+
     fun signOut() {
         authRepository.signOut()
     }
@@ -171,6 +178,7 @@ class TrackingViewModel @Inject constructor(
 
     fun ExerciseEntity.toExercise(): Exercise {
         return Exercise(
+            roomId = id,
             name = this.name,
             reps = this.reps,
             sets = this.sets

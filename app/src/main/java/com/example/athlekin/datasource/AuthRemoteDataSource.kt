@@ -19,9 +19,6 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
             awaitClose { auth.removeAuthStateListener(listener) }
         }
 
-    suspend fun createGuestAccount() {
-        auth.signInAnonymously().await()
-    }
 
     suspend fun signIn(email: String, password: String) : Result<FirebaseUser> {
 
@@ -50,7 +47,4 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
         auth.signOut()
     }
 
-    suspend fun deleteAccount() {
-        auth.currentUser!!.delete().await()
-    }
 }

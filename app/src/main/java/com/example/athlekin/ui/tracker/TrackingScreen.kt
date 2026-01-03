@@ -39,7 +39,7 @@ fun TrackingScreen(
 
     // Compose state from ViewModel
     val currExerciseState = viewModel.currExerciseState
-    val exercises by viewModel.roomExercises.collectAsState()
+    val exercises by viewModel.exercises.collectAsState()
 
 
 
@@ -107,7 +107,8 @@ fun TrackingScreen(
             }
 
 
-            ExerciseList(exercises)
+            ExerciseList(exercises,
+                onExerciseDelete = viewModel::deleteExercise)
 
 
 
