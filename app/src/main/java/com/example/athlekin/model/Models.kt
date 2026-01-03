@@ -3,8 +3,19 @@ package com.example.athlekin.model
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 
-data class Workout(
+data class WorkoutDoc(
     @DocumentId val id: String = "",
+    val ownerId : String? = "",
+    val createdAt: Timestamp = Timestamp.now(),
+    val name: String = "",
+    val exercises: List<Exercise> = emptyList()
+)
+
+ 
+// UI 
+
+data class Workout(
+    val id: String = "",
     val ownerId : String? = "",
     val createdAt: Timestamp = Timestamp.now(),
     val name: String = "",

@@ -2,21 +2,17 @@ package com.example.athlekin.ui.workouts
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.athlekin.data.AuthRepository
-import com.example.athlekin.model.Workout
 import com.example.athlekin.data.WorkoutsRepo
-import com.example.athlekin.datasource.WorkoutsRemoteDataSource
+import com.example.athlekin.model.Workout
+import com.example.athlekin.model.WorkoutDoc
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -29,7 +25,17 @@ class WorkoutsScreenViewModel @Inject constructor(
 
     var errorMessage by mutableStateOf("")
         private set
-    val workouts = workoutsRepo.getWorkouts(authRepository.currentUserIdFlow)
+
+
+    val workouts = workoutsRepo
+        .getWorkouts(authRepository.currentUserIdFlow)
+        .map { workoutDocs -> workoutDocs.map { it.toWorkout() } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
 
     fun deleteWorkout(id : String) {
 
@@ -44,4 +50,14 @@ class WorkoutsScreenViewModel @Inject constructor(
 
     }
 
+}
+
+fun WorkoutDoc.toWorkout(): Workout {
+    return Workout(
+        id = this.id,
+        ownerId = this.ownerId,
+        createdAt = this.createdAt,
+        name = this.name,
+        exercises = this.exercises
+    )
 }

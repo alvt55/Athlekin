@@ -9,7 +9,7 @@ import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.WorkoutsRepo
 
 import com.example.athlekin.model.Exercise
-import com.example.athlekin.model.Workout
+import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -131,7 +131,7 @@ class TrackingViewModel @Inject constructor(
 
         if (exercises.value.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
             // add workout based on UI fields
-            val workoutToAdd = Workout(
+            val workoutDocToAdd = WorkoutDoc(
                 ownerId = ownerId,
                 name = _uiState.value.workoutName,
                 exercises = exercises.value.map {
@@ -141,7 +141,7 @@ class TrackingViewModel @Inject constructor(
 
             viewModelScope.launch {
                 try {
-                    workoutsRepo.createWorkout(workoutToAdd)
+                    workoutsRepo.createWorkout(workoutDocToAdd)
 
                     // reset UI state and local storage after adding
                     offlineExercisesRepo.deleteAllExercises()

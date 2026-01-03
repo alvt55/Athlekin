@@ -1,6 +1,6 @@
 package com.example.athlekin.datasource
 
-import com.example.athlekin.model.Workout
+import com.example.athlekin.model.WorkoutDoc
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.dataObjects
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -14,7 +14,7 @@ class WorkoutsRemoteDataSource @Inject constructor(
 ) {
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<Workout>> {
+    fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
         return currentUserIdFlow.flatMapLatest { ownerId ->
             firestore
                 .collection(WORKOUTS_COLLECTION)
@@ -23,8 +23,8 @@ class WorkoutsRemoteDataSource @Inject constructor(
         }
     }
 
-    suspend fun createWorkout(workout: Workout): String {
-        return firestore.collection(WORKOUTS_COLLECTION).add(workout).await().id
+    suspend fun createWorkout(workoutDoc: WorkoutDoc): String {
+        return firestore.collection(WORKOUTS_COLLECTION).add(workoutDoc).await().id
     }
 
     suspend fun delete(id: String) {
