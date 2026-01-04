@@ -1,24 +1,21 @@
 package com.example.athlekin.data
 
 
+import android.R.attr.end
 import android.content.ContentUris
 import android.content.Context
-import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract
 import android.util.Log
-import com.example.athlekin.datasource.WorkoutsRemoteDataSource
-import com.google.common.io.Files.map
 import com.google.firebase.Timestamp
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.stream.Collectors.groupingBy
+import java.util.Date
+import java.util.TimeZone
 import javax.inject.Inject
 
 
@@ -48,14 +45,12 @@ class CalendarRepo @Inject constructor(
 
 
 
-    // possible parameters can be:
-    // start and end dates to query
-    // duration of workouts (e.g 1 hr)
-    // number of slots to return N
+    // takes in start and end boundaries - computes the best timeslot based on past workouts
+    // TODO: handle date picker time zones - currently it is off due to epoch and not local
     suspend fun queryCalendars(start : Long, end : Long) {
-        Log.d(DEBUG_TAG, "queryCalendars() firing")
+        Log.d(DEBUG_TAG, "${start.toReadable()} -> ${end.toReadable()}")
 
-        val availableTimes = mutableListOf<Pair<Long, Long>>()
+        val busySlots = mutableListOf<Pair<Long, Long>>()
 
 
         val selection: String = "${CalendarContract.Instances.ALL_DAY} = ?"
@@ -98,23 +93,19 @@ class CalendarRepo @Inject constructor(
                     val formatter = SimpleDateFormat("MM/dd/yyyy")
                     Log.i(DEBUG_TAG, "Date: ${formatter.format(calendar.time)}")
                     Log.i(DEBUG_TAG, "start: $beginVal, end: $endVal")
-                    availableTimes.add(Pair(beginVal, endVal))
+                    busySlots.add(Pair(beginVal, endVal))
 
 
                 }
             }
         }
 
+        val timeSlots = findAvailableSlots(busySlots, start, end)
 
-        if (availableTimes.isNotEmpty()) {
+        if (timeSlots.isNotEmpty()) {
+            Log.i(DEBUG_TAG, "list of available slots: $timeSlots")
 
-            Log.i(DEBUG_TAG, "list of availabilities: $availableTimes")
-
-            // loop through available times, keeping note of day of week and time
-            // rank based on previous data
-            // sort these slots
-            // pick top N slots
-
+            // getting the user's workout frequency information
             val workouts = workoutRepo.getWorkouts(authRepo.currentUserIdFlow).first()
 
             val preferredDays: Map<Int, Int> = workouts
@@ -128,6 +119,26 @@ class CalendarRepo @Inject constructor(
             println(preferredHours)
             println(preferredDays)
 
+            var bestScore : Pair<Pair<Long, Long>, Double> = Pair(Pair(0L, 0L), 0.0)
+
+            for (slot in timeSlots) {
+                val score = scoreSlot(slot.first, preferredDays, preferredHours)
+                println(score)
+                if (score > bestScore.second) {
+                    bestScore = Pair(slot, score)
+                }
+            }
+
+            println(bestScore)
+
+
+
+
+
+        }
+
+
+
 
 
 
@@ -138,8 +149,62 @@ class CalendarRepo @Inject constructor(
 
     }
 
+fun scoreSlot(
+    slotStart: Long,
+    preferredDays: Map<Int, Int>,
+    preferredHours: Map<Int, Int>
+): Double {
+    // Convert slotStart to Calendar to extract day and hour
+    val calendar = Calendar.getInstance().apply { timeInMillis = slotStart }
+    val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+    val hourOfDay = calendar.get(Calendar.HOUR_OF_DAY)
 
+    // Get counts from maps (default to 0)
+    val dayCount = preferredDays[dayOfWeek] ?: 0
+    val hourCount = preferredHours[hourOfDay] ?: 0
+
+    // Normalize counts to fractions (so scoring is relative)
+    val maxDayCount = preferredDays.values.maxOrNull() ?: 1
+    val maxHourCount = preferredHours.values.maxOrNull() ?: 1
+
+    val dayScore = dayCount.toDouble() / maxDayCount
+    val hourScore = hourCount.toDouble() / maxHourCount
+
+    // Weighted sum: for example, day preference = 40%, hour preference = 60%
+    return 0.4 * dayScore + 0.6 * hourScore
 }
+
+
+fun findAvailableSlots(busySlots : List<Pair<Long, Long>>, start : Long, end : Long) : List<Pair<Long, Long>> {
+    val sortedBusySlots = busySlots.sortedBy { it.first }
+
+    val availableOneHourSlots = mutableListOf<Pair<Long, Long>>()
+    var currentTime = start
+
+    // for each busy event
+    for ((eventStart, eventEnd) in sortedBusySlots) {
+        // While there is at least 1 full hour before this event
+        while (currentTime + 60 * 60 * 1000 <= eventStart) {
+            val slotEnd = currentTime + 60 * 60 * 1000
+            availableOneHourSlots.add(currentTime to slotEnd)
+            currentTime = slotEnd
+        }
+
+        // move currentTime forward past this event if needed
+        currentTime = maxOf(currentTime, eventEnd)
+    }
+
+    // After the last event, fill remaining hours until query end
+    while (currentTime + 60 * 60 * 1000 <= end) {
+        val slotEnd = currentTime + 60 * 60 * 1000
+        availableOneHourSlots.add(currentTime to slotEnd)
+        currentTime = slotEnd
+    }
+
+    return availableOneHourSlots
+}
+
+
 
 
 fun Timestamp.dayOfWeek(): Int {
@@ -157,4 +222,8 @@ fun Timestamp.hourOfDay(): Int {
 }
 
 
-
+fun Long.toReadable(): String {
+    val sdf = SimpleDateFormat("EEE, MMM dd yyyy HH:mm") // e.g., Mon, Jun 21 2026 15:00
+    sdf.timeZone = TimeZone.getDefault() // your local timezone
+    return sdf.format(Date(this))
+}
