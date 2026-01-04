@@ -1,5 +1,6 @@
 package com.example.athlekin.ui.components
 
+import android.R.attr.onClick
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -222,7 +223,7 @@ fun WorkoutList(workoutsList: List<Workout>, onDeleteClick: (String) -> Unit) {
 
                 Column() {
                     Text(
-                        text = workout.name,
+                        text = "${workout.name} - ${workout.createdAt.toDate()} ",
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp),

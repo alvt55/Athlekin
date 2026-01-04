@@ -7,12 +7,19 @@ import android.database.Cursor
 import android.net.Uri
 import android.provider.CalendarContract
 import android.util.Log
+import com.example.athlekin.datasource.WorkoutsRemoteDataSource
+import com.google.common.io.Files.map
+import com.google.firebase.Timestamp
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Calendar
-
-
+import java.util.stream.Collectors.groupingBy
+import javax.inject.Inject
 
 
 const val PROJECTION_TITLE_INDEX: Int = 0
@@ -25,9 +32,12 @@ const val PROJECTION_END_INDEX: Int = 2
 
 
 const val DEBUG_TAG: String = "CALENDAR"
-class CalendarRepo(
-    private val context: Context
-) {
+
+class CalendarRepo @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val workoutRepo: WorkoutsRepo,
+    private val authRepo: AuthRepository
+){
 
     val INSTANCE_PROJECTION: Array<String> = arrayOf(
         CalendarContract.Instances.TITLE, // 0
@@ -36,26 +46,16 @@ class CalendarRepo(
     )
 
 
+
+
     // possible parameters can be:
     // start and end dates to query
     // duration of workouts (e.g 1 hr)
     // number of slots to return N
-    suspend fun queryCalendars() {
+    suspend fun queryCalendars(start : Long, end : Long) {
         Log.d(DEBUG_TAG, "queryCalendars() firing")
 
-
         val availableTimes = mutableListOf<Pair<Long, Long>>()
-
-
-        // set start and end boundaries
-        val startMillis: Long = Calendar.getInstance().run {
-            set(2025, 11, 22, 8, 0)
-            timeInMillis
-        }
-        val endMillis: Long = Calendar.getInstance().run {
-            set(2025, 11, 24, 8, 0)
-            timeInMillis
-        }
 
 
         val selection: String = "${CalendarContract.Instances.ALL_DAY} = ?"
@@ -64,8 +64,8 @@ class CalendarRepo(
 
         // build the URI with the start/end boundaries
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
-        ContentUris.appendId(builder, startMillis)
-        ContentUris.appendId(builder, endMillis)
+        ContentUris.appendId(builder, start)
+        ContentUris.appendId(builder, end)
 
 
         // setup context to I/O
@@ -115,6 +115,23 @@ class CalendarRepo(
             // sort these slots
             // pick top N slots
 
+            val workouts = workoutRepo.getWorkouts(authRepo.currentUserIdFlow).first()
+
+            val preferredDays: Map<Int, Int> = workouts
+                .groupingBy { it.createdAt.dayOfWeek() }
+                .eachCount()
+
+            val preferredHours: Map<Int, Int> = workouts
+                .groupingBy { it.createdAt.hourOfDay() }
+                .eachCount()
+
+            println(preferredHours)
+            println(preferredDays)
+
+
+
+
+
         }
 
 
@@ -124,6 +141,20 @@ class CalendarRepo(
 
 }
 
+
+fun Timestamp.dayOfWeek(): Int {
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = this@dayOfWeek.toDate().time
+    }
+    return calendar.get(Calendar.DAY_OF_WEEK)
+}
+
+fun Timestamp.hourOfDay(): Int {
+    val calendar = Calendar.getInstance().apply {
+        timeInMillis = this@hourOfDay.toDate().time
+    }
+    return calendar.get(Calendar.HOUR_OF_DAY)
+}
 
 
 

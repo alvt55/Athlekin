@@ -33,31 +33,7 @@ fun WorkoutsScreen(onToTrackingClicked : () -> Unit, onShareButton : (String) ->
 
     val workouts by viewModel.workouts.collectAsStateWithLifecycle(emptyList())
 
-
-
     val errorMessage = viewModel.errorMessage
-    val calendarViewModel : CalendarViewModel = viewModel(factory= CalendarViewModel.factory(LocalContext.current))
-
-    val calendarPermissionState = rememberPermissionState(
-        Manifest.permission.READ_CALENDAR
-    )
-
-    // Auto-request permission on first load
-    LaunchedEffect(Unit) {
-        if (!calendarPermissionState.status.isGranted) {
-            Log.d(WORKOUTS_SCREEN_TAG,"Auto-requesting calendar permission")
-            calendarPermissionState.launchPermissionRequest()
-        }
-    }
-
-    // Call API when permission is granted
-    LaunchedEffect(calendarPermissionState.status.isGranted) {
-        Log.d(WORKOUTS_SCREEN_TAG, "Permission status: ${calendarPermissionState.status.isGranted}")
-        if (calendarPermissionState.status.isGranted) {
-            Log.d(WORKOUTS_SCREEN_TAG, "Calling getAvailableSlots()")
-            calendarViewModel.getAvailableSlots()
-        }
-    }
 
 
 

@@ -29,6 +29,7 @@ import com.example.athlekin.ui.utils.AthelkinContentType
 fun TrackingScreen(
     onToWorkoutsClicked: () -> Unit,
     onToSignIn: () -> Unit,
+    onToCalendar: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TrackingViewModel,
     contentType: AthelkinContentType
@@ -137,6 +138,13 @@ fun TrackingScreen(
                 onClick = onToWorkoutsClicked
             ) {
                 Text("To Workouts List")
+            }
+
+            Button(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = onToCalendar
+            ) {
+                Text("To Calendar")
             }
 
 

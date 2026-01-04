@@ -17,6 +17,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.athlekin.ui.calendar.CalendarScreen
+import com.example.athlekin.ui.calendar.CalendarViewModel
 import com.example.athlekin.ui.createAccount.CreateAccountScreen
 import com.example.athlekin.ui.createAccount.CreateAccountViewModel
 import com.example.athlekin.ui.login.SignInViewModel
@@ -61,7 +63,7 @@ fun AthlekinApp(
 
         NavHost(
             navController = navController,
-            startDestination = AthelkinScreen.SignIn.name,
+            startDestination = AthelkinScreen.Calendar.name,
             modifier = Modifier.Companion.padding(innerPadding)
         ) {
             composable(route = AthelkinScreen.SignIn.name) {
@@ -82,6 +84,7 @@ fun AthlekinApp(
                 TrackingScreen(
                     onToWorkoutsClicked = { navController.navigate(AthelkinScreen.Workouts.name) },
                     onToSignIn = { navController.navigate(AthelkinScreen.SignIn.name) },
+                    onToCalendar = { navController.navigate(AthelkinScreen.Calendar.name) },
                     modifier = Modifier,
                     viewModel = trackingViewModel,
                     contentType = contentType
@@ -97,6 +100,15 @@ fun AthlekinApp(
                         shareWorkouts(context, summary)
                     },
                     modifier = Modifier,
+                    viewModel = viewModel,
+                )
+            }
+
+            composable(route = AthelkinScreen.Calendar.name) {
+                val viewModel = hiltViewModel<CalendarViewModel>()
+
+                CalendarScreen(
+                    onToTrackingClicked = { navController.navigate(AthelkinScreen.Tracking.name) },
                     viewModel = viewModel,
                 )
             }

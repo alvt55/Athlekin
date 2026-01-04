@@ -112,7 +112,8 @@ enum class AthelkinScreen(@StringRes val title: Int) {
     Tracking(title = R.string.tracking_page),
     Workouts(title = R.string.workouts_page),
     CreateAccount(title = R.string.create_account),
-    SignIn(title = R.string.signin)
+    SignIn(title = R.string.signin),
+    Calendar(title = R.string.calendar)
 
 }
 
