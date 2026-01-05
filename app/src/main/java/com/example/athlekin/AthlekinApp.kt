@@ -22,10 +22,10 @@ import com.example.athlekin.ui.calendar.CalendarViewModel
 import com.example.athlekin.ui.createAccount.CreateAccountScreen
 import com.example.athlekin.ui.createAccount.CreateAccountViewModel
 import com.example.athlekin.ui.login.SignInViewModel
-import com.example.athlekin.ui.tracker.TrackingViewModel
 import com.example.athlekin.ui.tracker.TrackingScreen
-import com.example.athlekin.ui.workouts.WorkoutsScreen
+import com.example.athlekin.ui.tracker.TrackingViewModel
 import com.example.athlekin.ui.utils.AthelkinContentType
+import com.example.athlekin.ui.workouts.WorkoutsScreen
 import com.example.athlekin.ui.workouts.WorkoutsScreenViewModel
 
 
@@ -69,16 +69,20 @@ fun AthlekinApp(
             composable(route = AthelkinScreen.SignIn.name) {
                 val viewModel = hiltViewModel<SignInViewModel>()
 
-                SignInScreen(openTrackerScreen = {navController.navigate(AthelkinScreen.Tracking.name)},
-                            onToCreateAccount = {navController.navigate(AthelkinScreen.CreateAccount.name)},
-                    viewModel = viewModel)
+                SignInScreen(
+                    openTrackerScreen = { navController.navigate(AthelkinScreen.Tracking.name) },
+                    onToCreateAccount = { navController.navigate(AthelkinScreen.CreateAccount.name) },
+                    viewModel = viewModel
+                )
             }
             composable(route = AthelkinScreen.CreateAccount.name) {
                 val viewModel = hiltViewModel<CreateAccountViewModel>()
 
-                CreateAccountScreen(openTrackerScreen = {navController.navigate(AthelkinScreen.Tracking.name)},
-                        onToSignIn= {navController.navigate(AthelkinScreen.SignIn.name)},
-                                viewModel = viewModel)
+                CreateAccountScreen(
+                    openTrackerScreen = { navController.navigate(AthelkinScreen.Tracking.name) },
+                    onToSignIn = { navController.navigate(AthelkinScreen.SignIn.name) },
+                    viewModel = viewModel
+                )
             }
             composable(route = AthelkinScreen.Tracking.name) {
                 TrackingScreen(
@@ -120,8 +124,7 @@ fun AthlekinApp(
 }
 
 
-
-private fun shareWorkouts(context : Context, summary : String) {
+private fun shareWorkouts(context: Context, summary: String) {
 
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"

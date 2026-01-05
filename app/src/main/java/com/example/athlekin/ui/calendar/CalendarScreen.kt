@@ -1,7 +1,6 @@
 package com.example.athlekin.ui.calendar
 
 import android.Manifest
-import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,21 +11,16 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.ui.workouts.WORKOUTS_SCREEN_TAG
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -37,7 +31,6 @@ fun CalendarScreen(
 ) {
 
 
-
     val calendarPermissionState = rememberPermissionState(
         Manifest.permission.READ_CALENDAR
     )
@@ -45,7 +38,7 @@ fun CalendarScreen(
     // Auto-request permission on first load
     LaunchedEffect(Unit) {
         if (!calendarPermissionState.status.isGranted) {
-            Log.d(WORKOUTS_SCREEN_TAG,"Auto-requesting calendar permission")
+            Log.d(WORKOUTS_SCREEN_TAG, "Auto-requesting calendar permission")
             calendarPermissionState.launchPermissionRequest()
         }
     }
@@ -69,15 +62,15 @@ fun CalendarScreen(
         )
     }
 
-    Column() {
+    Column {
         Button(
-            onClick = {viewModel.showDateRangeModal = true}
+            onClick = { viewModel.showDateRangeModal = true }
         ) {
             Text("Pick date range")
         }
 
         Button(
-            onClick = {viewModel.getAvailableSlots()}
+            onClick = { viewModel.getAvailableSlots() }
         ) {
             Text("Generate time slots")
         }
@@ -92,8 +85,6 @@ fun CalendarScreen(
             Text("To Tracking")
         }
     }
-
-
 
 
 }

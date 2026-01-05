@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.StringRes
-
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,19 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-
-
-import androidx.compose.runtime.Composable
-
-import androidx.compose.ui.tooling.preview.Preview
-
-
-
-import com.example.athlekin.ui.theme.AthlekinTheme
-import androidx.compose.ui.Modifier
-
-
-
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,10 +20,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.athlekin.ui.theme.AthlekinTheme
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 
 
 @AndroidEntryPoint
@@ -47,7 +35,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            AthlekinTheme() {
+            AthlekinTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize()
                 ) {
@@ -63,12 +51,11 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 @Preview(showBackground = true)
 @Composable
 // preview of main page
 fun CompactScreenPreview() {
-    AthlekinTheme() {
+    AthlekinTheme {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -82,7 +69,7 @@ fun CompactScreenPreview() {
 @Composable
 // preview of main page
 fun MediumScreenPreview() {
-    AthlekinTheme() {
+    AthlekinTheme {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -96,7 +83,7 @@ fun MediumScreenPreview() {
 @Composable
 // preview of main page
 fun ExpandedScreenPreview() {
-    AthlekinTheme() {
+    AthlekinTheme {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -105,7 +92,6 @@ fun ExpandedScreenPreview() {
 
     }
 }
-
 
 
 enum class AthelkinScreen(@StringRes val title: Int) {
@@ -132,7 +118,7 @@ fun AthelkinAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
 
-        ),
+            ),
         modifier = modifier,
         navigationIcon = {
             if (canNavigateBack) {

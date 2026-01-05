@@ -12,17 +12,16 @@ class AuthRepository @Inject constructor(
     val currentUserIdFlow: Flow<String?> = authRemoteDataSource.currentUserIdFlow
 
 
-
-    suspend fun signIn(email: String, password: String) : Result<FirebaseUser>{
+    suspend fun signIn(email: String, password: String): Result<FirebaseUser> {
         return authRemoteDataSource.signIn(email, password)
     }
 
-    suspend fun createAccount(email: String, password: String) : Result<FirebaseUser>{
-       return authRemoteDataSource.createAccount(email, password)
+    suspend fun createAccount(email: String, password: String): Result<FirebaseUser> {
+        return authRemoteDataSource.createAccount(email, password)
     }
 
-    fun signOut() {
-        authRemoteDataSource.signOut()
+    fun signOut() : Result<FirebaseUser>{
+        return authRemoteDataSource.signOut()
     }
 
 

@@ -25,20 +25,17 @@ class SignInViewModel @Inject constructor(
     fun signIn(
         email: String,
         password: String,
-//        showErrorSnackbar: (ErrorMessage) -> Unit
     ) {
 
 
         viewModelScope.launch {
             val result = authRepository.signIn(email, password)
 
-            result
-                .onSuccess {
-                    _shouldGoTracker.value = true
-                }
-                .onFailure { error ->
-                    _errorMessage.value = error.message ?: "Sign in failed"
-                }
+            result.onSuccess {
+                _shouldGoTracker.value = true
+            }.onFailure { error ->
+                _errorMessage.value = error.message ?: "Sign in failed"
+            }
         }
 
 

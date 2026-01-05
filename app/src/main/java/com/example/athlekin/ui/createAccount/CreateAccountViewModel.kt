@@ -26,7 +26,6 @@ class CreateAccountViewModel @Inject constructor(
         email: String,
         password: String,
         repeatPassword: String,
-//        showErrorSnackbar: (ErrorMessage) -> Unit
     ) {
 
 

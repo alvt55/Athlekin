@@ -1,6 +1,5 @@
 package com.example.athlekin.datasource
 
-import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.channels.awaitClose
@@ -20,7 +19,7 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
         }
 
 
-    suspend fun signIn(email: String, password: String) : Result<FirebaseUser> {
+    suspend fun signIn(email: String, password: String): Result<FirebaseUser> {
 
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
@@ -31,7 +30,7 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
 
     }
 
-    suspend fun createAccount(email: String, password: String) : Result<FirebaseUser> {
+    suspend fun createAccount(email: String, password: String): Result<FirebaseUser> {
         return try {
             auth.createUserWithEmailAndPassword(email, password).await()
             Result.success(auth.currentUser!!)
@@ -40,11 +39,15 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
         }
     }
 
-    fun signOut() {
-        if (auth.currentUser!!.isAnonymous) {
-            auth.currentUser!!.delete()
+    fun signOut() : Result<FirebaseUser>{
+
+        return try {
+            auth.signOut()
+            Result.success(auth.currentUser!!)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
-        auth.signOut()
+
     }
 
 }

@@ -3,6 +3,7 @@ package com.example.athlekin.room
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+// room entity model
 @Entity(tableName = "exercises")
 data class ExerciseEntity(
     @PrimaryKey(autoGenerate = true)

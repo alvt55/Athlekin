@@ -25,8 +25,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-const val TRACKERVM_TAG: String = "TRACKER_VM"
-
 // state about the entire workout
 data class TrackerUiState(
     val workoutName: String = "",
@@ -135,7 +133,7 @@ class TrackingViewModel @Inject constructor(
                 ownerId = ownerId,
                 name = _uiState.value.workoutName,
                 exercises = exercises.value.map {
-                    Exercise(name=it.name, reps=it.reps, sets=it.sets) // room_id set to 0
+                    Exercise(name = it.name, reps = it.reps, sets = it.sets) // room_id set to 0
                 }
             )
 
@@ -161,7 +159,7 @@ class TrackingViewModel @Inject constructor(
     }
 
     // delete exercise from Room based on room_id
-    fun deleteExercise(roomId : Int) {
+    fun deleteExercise(roomId: Int) {
         viewModelScope.launch {
             offlineExercisesRepo.deleteExerciseById(roomId)
         }
@@ -169,7 +167,13 @@ class TrackingViewModel @Inject constructor(
 
 
     fun signOut() {
-        authRepository.signOut()
+
+        try {
+            authRepository.signOut()
+        } catch (e: Exception) {
+            _uiState.update { it.copy(errorMessage = "Failed to sign out: ${e.message}") }
+        }
+
     }
 
     internal fun setUiStateForTest(state: TrackerUiState) {

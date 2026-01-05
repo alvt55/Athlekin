@@ -1,7 +1,6 @@
 package com.example.athlekin.data
 
 
-import android.R.attr.end
 import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
@@ -12,10 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
-import java.util.TimeZone
 import javax.inject.Inject
 
 
@@ -24,17 +20,13 @@ const val PROJECTION_BEGIN_INDEX: Int = 1
 const val PROJECTION_END_INDEX: Int = 2
 
 
-
-
-
-
 const val DEBUG_TAG: String = "CALENDAR"
 
 class CalendarRepo @Inject constructor(
     @ApplicationContext private val context: Context,
     private val workoutRepo: WorkoutsRepo,
     private val authRepo: AuthRepository
-){
+) {
 
     val INSTANCE_PROJECTION: Array<String> = arrayOf(
         CalendarContract.Instances.TITLE, // 0
@@ -43,19 +35,17 @@ class CalendarRepo @Inject constructor(
     )
 
 
-
-
     // takes in start and end boundaries - computes the best timeslot based on past workouts
-    // TODO: handle date picker time zones - currently it is off due to epoch and not local
-    suspend fun queryCalendars(start : Long, end : Long) {
-        Log.d(DEBUG_TAG, "${start.toReadable()} -> ${end.toReadable()}")
+    // TODO: handle date picker time zones
+    suspend fun queryCalendars(start: Long, end: Long) {
 
+
+        // stores time slots that a user has events occuring
         val busySlots = mutableListOf<Pair<Long, Long>>()
 
-
+        // setup query for calendar provider
         val selection: String = "${CalendarContract.Instances.ALL_DAY} = ?"
         val selectionArgs: Array<String> = arrayOf("0")
-
 
         // build the URI with the start/end boundaries
         val builder: Uri.Builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
@@ -66,7 +56,7 @@ class CalendarRepo @Inject constructor(
         // setup context to I/O
         withContext(Dispatchers.IO) {
 
-
+            // query calendars
             context.contentResolver.query(
                 builder.build(),
                 INSTANCE_PROJECTION,
@@ -87,11 +77,6 @@ class CalendarRepo @Inject constructor(
 
 
                     Log.i(DEBUG_TAG, "Event: $titleVal")
-                    val calendar = Calendar.getInstance().apply {
-                        timeInMillis = beginVal
-                    }
-                    val formatter = SimpleDateFormat("MM/dd/yyyy")
-                    Log.i(DEBUG_TAG, "Date: ${formatter.format(calendar.time)}")
                     Log.i(DEBUG_TAG, "start: $beginVal, end: $endVal")
                     busySlots.add(Pair(beginVal, endVal))
 
@@ -116,14 +101,12 @@ class CalendarRepo @Inject constructor(
                 .groupingBy { it.createdAt.hourOfDay() }
                 .eachCount()
 
-            println(preferredHours)
-            println(preferredDays)
 
-            var bestScore : Pair<Pair<Long, Long>, Double> = Pair(Pair(0L, 0L), 0.0)
+            // TODO: change formatting of the two Long dates to formatted based on locale time
+            var bestScore: Pair<Pair<Long, Long>, Double> = Pair(Pair(0L, 0L), 0.0)
 
             for (slot in timeSlots) {
                 val score = scoreSlot(slot.first, preferredDays, preferredHours)
-                println(score)
                 if (score > bestScore.second) {
                     bestScore = Pair(slot, score)
                 }
@@ -132,23 +115,16 @@ class CalendarRepo @Inject constructor(
             println(bestScore)
 
 
-
-
-
         }
-
-
-
-
-
-
-
-        }
-
 
 
     }
 
+
+}
+
+
+// score an individual time slot based on user's workout frequency
 fun scoreSlot(
     slotStart: Long,
     preferredDays: Map<Int, Int>,
@@ -175,7 +151,12 @@ fun scoreSlot(
 }
 
 
-fun findAvailableSlots(busySlots : List<Pair<Long, Long>>, start : Long, end : Long) : List<Pair<Long, Long>> {
+// given a list of busy time slots, return a list of available time slots (1 hour length)
+fun findAvailableSlots(
+    busySlots: List<Pair<Long, Long>>,
+    start: Long,
+    end: Long
+): List<Pair<Long, Long>> {
     val sortedBusySlots = busySlots.sortedBy { it.first }
 
     val availableOneHourSlots = mutableListOf<Pair<Long, Long>>()
@@ -205,8 +186,6 @@ fun findAvailableSlots(busySlots : List<Pair<Long, Long>>, start : Long, end : L
 }
 
 
-
-
 fun Timestamp.dayOfWeek(): Int {
     val calendar = Calendar.getInstance().apply {
         timeInMillis = this@dayOfWeek.toDate().time
@@ -222,8 +201,3 @@ fun Timestamp.hourOfDay(): Int {
 }
 
 
-fun Long.toReadable(): String {
-    val sdf = SimpleDateFormat("EEE, MMM dd yyyy HH:mm") // e.g., Mon, Jun 21 2026 15:00
-    sdf.timeZone = TimeZone.getDefault() // your local timezone
-    return sdf.format(Date(this))
-}

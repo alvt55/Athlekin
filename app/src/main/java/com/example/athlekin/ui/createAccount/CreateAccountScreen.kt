@@ -25,7 +25,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun CreateAccountScreen(
     openTrackerScreen: () -> Unit,
     onToSignIn: () -> Unit,
-//    showErrorSnackbar: (ErrorMessage) -> Unit,
     viewModel: CreateAccountViewModel
 ) {
     val shouldGoTracker by viewModel.shouldGoTracker.collectAsStateWithLifecycle()
@@ -45,10 +44,11 @@ fun CreateAccountScreen(
 }
 
 
-
 @Composable
-fun CreateAccountScreenContent(signUp : (String, String, String) -> Unit,
-                               onToSignIn: () -> Unit, errorMessage : String?) {
+fun CreateAccountScreenContent(
+    signUp: (String, String, String) -> Unit,
+    onToSignIn: () -> Unit, errorMessage: String?
+) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -115,118 +115,3 @@ fun CreateAccountScreenContent(signUp : (String, String, String) -> Unit,
         }
     }
 }
-//
-//@Composable
-//@OptIn(ExperimentalMaterial3Api::class)
-//fun SignUpScreenContent(
-//    signUp: (String, String, String, (ErrorMessage) -> Unit) -> Unit,
-//    showErrorSnackbar: (ErrorMessage) -> Unit
-//) {
-//    var email by remember { mutableStateOf("") }
-//    var password by remember { mutableStateOf("") }
-//    var repeatPassword by remember { mutableStateOf("") }
-//    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-//
-//    Scaffold(
-//        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-//    ) { innerPadding ->
-//        ConstraintLayout(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-//            val (appLogo, form) = createRefs()
-//
-//            Column(
-//                modifier = Modifier
-//                    .constrainAs(appLogo) {
-//                        top.linkTo(parent.top)
-//                        start.linkTo(parent.start)
-//                        end.linkTo(parent.end)
-//                    },
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                Spacer(Modifier.size(24.dp))
-//
-//                Image(
-//                    modifier = Modifier.size(88.dp),
-//                    painter = painterResource(id = R.mipmap.ic_launcher_round),
-//                    contentDescription = "App logo"
-//                )
-//
-//                Spacer(Modifier.size(24.dp))
-//            }
-//
-//            Column(
-//                modifier = Modifier
-//                    .constrainAs(form) {
-//                        top.linkTo(appLogo.bottom)
-//                        start.linkTo(parent.start)
-//                        end.linkTo(parent.end)
-//                    },
-//                horizontalAlignment = Alignment.CenterHorizontally
-//            ) {
-//                Spacer(Modifier.size(24.dp))
-//
-//                OutlinedTextField(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 24.dp),
-//                    value = email,
-//                    onValueChange = { email = it },
-//                    label = { Text(stringResource(R.string.email)) }
-//                )
-//
-//                Spacer(Modifier.size(16.dp))
-//
-//                OutlinedTextField(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 24.dp),
-//                    value = password,
-//                    onValueChange = { password = it },
-//                    label = { Text(stringResource(R.string.password)) },
-//                    visualTransformation = PasswordVisualTransformation()
-//                )
-//
-//                Spacer(Modifier.size(16.dp))
-//
-//                OutlinedTextField(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(horizontal = 24.dp),
-//                    value = repeatPassword,
-//                    onValueChange = { repeatPassword = it },
-//                    label = { Text(stringResource(R.string.repeat_password)) },
-//                    visualTransformation = PasswordVisualTransformation()
-//                )
-//
-//                Spacer(Modifier.size(32.dp))
-//
-//                StandardButton(
-//                    label = R.string.sign_up_with_email,
-//                    onButtonClick = {
-//                        signUp(
-//                            email,
-//                            password,
-//                            repeatPassword,
-//                            showErrorSnackbar
-//                        )
-//                    }
-//                )
-//
-//                Spacer(Modifier.size(16.dp))
-//
-//                //TODO: Uncomment line below when Google Authentication is implemented
-//                //AuthWithGoogleButton(R.string.sign_up_with_google) { }
-//            }
-//        }
-//    }
-//}
-//
-//@Composable
-//@Preview(showSystemUi = true)
-//fun SignUpScreenPreview() {
-//    MakeItSoTheme(darkTheme = true) {
-//        SignUpScreenContent(
-//            signUp = { _, _, _, _ -> },
-//            showErrorSnackbar = {}
-//        )
-//    }
-//}

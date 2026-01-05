@@ -2,16 +2,13 @@ package com.example.athlekin.injection
 
 import android.content.Context
 import androidx.room.Room
-import com.example.athlekin.room.ExerciseDao
 import com.example.athlekin.room.ExerciseDatabase
-import com.example.athlekin.room.OfflineExercisesRepo
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
-import kotlin.jvm.java
 
 
 @Module

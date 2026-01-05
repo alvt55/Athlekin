@@ -1,15 +1,10 @@
 package com.example.athlekin.ui.calendar
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.athlekin.data.CalendarRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -26,6 +21,7 @@ class CalendarViewModel @Inject constructor(
     var showDateRangeModal by mutableStateOf<Boolean>(false)
     var errorMessage by mutableStateOf<String?>(null)
 
+    // for now, just println the best available slot based on previous workouts
     fun getAvailableSlots() {
         val (start, end) = datePickerState
         if (start == null || end == null) {

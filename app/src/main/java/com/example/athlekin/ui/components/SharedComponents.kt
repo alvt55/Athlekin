@@ -1,7 +1,5 @@
 package com.example.athlekin.ui.components
 
-import android.R.attr.onClick
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,7 +20,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,25 +33,7 @@ import androidx.compose.ui.unit.dp
 import com.example.athlekin.R
 import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.Workout
-import com.example.athlekin.model.WorkoutDoc
 
-
-@Composable
-// exercise input field
-fun TextInput(
-    @StringRes label: Int,
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-
-    TextField(
-        value,
-        onValueChange,
-        label = { Text(stringResource(label)) }
-    )
-
-}
 
 @Composable
 fun NumberStepper(
@@ -100,9 +79,11 @@ fun NumberStepper(
 
 @Composable
 // list of exercises for the current workout
-fun ExerciseList(exerciseList: List<Exercise>,
-                 onExerciseDelete : (Int) -> Unit,
-                 modifier: Modifier = Modifier) {
+fun ExerciseList(
+    exerciseList: List<Exercise>,
+    onExerciseDelete: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     Column(modifier = modifier.fillMaxHeight(0.3f)) {
         // header
@@ -128,7 +109,7 @@ fun ExerciseList(exerciseList: List<Exercise>,
         }
 
 
-        LazyColumn() {
+        LazyColumn {
             items(exerciseList) {
                 ExerciseItem(
                     exercise = it,
@@ -166,11 +147,15 @@ private fun ExpandButton(
 
 @Composable
 // ui for an exercise item
-fun ExerciseItem(exercise: Exercise, onExerciseDelete: (Int) -> Unit,  modifier: Modifier = Modifier) {
+fun ExerciseItem(
+    exercise: Exercise,
+    onExerciseDelete: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     var expanded by remember { mutableStateOf(false) }
 
-    Column() {
+    Column {
         Card(modifier = modifier) {
             Row(
                 modifier = modifier.fillMaxWidth(),
@@ -197,7 +182,7 @@ fun ExerciseItem(exercise: Exercise, onExerciseDelete: (Int) -> Unit,  modifier:
                         style = MaterialTheme.typography.labelSmall
                     )
                     Button(
-                        onClick={onExerciseDelete(exercise.roomId)}
+                        onClick = { onExerciseDelete(exercise.roomId) }
                     ) {
                         Text("delete")
                     }
@@ -221,34 +206,32 @@ fun WorkoutList(workoutsList: List<Workout>, onDeleteClick: (String) -> Unit) {
             // Workout name as a "header"
 
 
-                Column() {
+            Column {
+                Text(
+                    text = "${workout.name} - ${workout.createdAt.toDate()} ",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                // Each exercise in this workout
+                workout.exercises.forEach { exercise ->
+
                     Text(
-                        text = "${workout.name} - ${workout.createdAt.toDate()} ",
+                        text = "${exercise.name} - ${exercise.sets} sets x ${exercise.reps} reps",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        style = MaterialTheme.typography.titleMedium
+                            .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
+                            .padding(8.dp)
                     )
+                }
 
-                    // Each exercise in this workout
-                    workout.exercises.forEach { exercise ->
-
-                        Text(
-                            text = "${exercise.name} - ${exercise.sets} sets x ${exercise.reps} reps",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 16.dp, top = 4.dp, bottom = 4.dp)
-                                .padding(8.dp)
-                        )
-                    }
-
-                    Button(
-                        onClick = { onDeleteClick(workout.id) }
-                    ) {
-                        Text("Delete")
-                    }
-
-
+                Button(
+                    onClick = { onDeleteClick(workout.id) }
+                ) {
+                    Text("Delete")
+                }
 
 
             }

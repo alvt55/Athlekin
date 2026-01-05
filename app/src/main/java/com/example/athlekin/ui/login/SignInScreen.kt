@@ -1,4 +1,3 @@
-import android.R.attr.onClick
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,15 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.athlekin.ui.createAccount.CreateAccountViewModel
 import com.example.athlekin.ui.login.SignInViewModel
 
 @Composable
 fun SignInScreen(
     openTrackerScreen: () -> Unit,
     onToCreateAccount: () -> Unit,
-//    showErrorSnackbar: (ErrorMessage) -> Unit,
     viewModel: SignInViewModel
 ) {
     val shouldGoTracker by viewModel.shouldGoTracker.collectAsStateWithLifecycle()
@@ -46,9 +42,12 @@ fun SignInScreen(
 }
 
 
-
 @Composable
-fun SignInScreenContent(signIn : (String, String) -> Unit, onToCreateAccount : () -> Unit, errorMessage : String?) {
+fun SignInScreenContent(
+    signIn: (String, String) -> Unit,
+    onToCreateAccount: () -> Unit,
+    errorMessage: String?
+) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -105,4 +104,3 @@ fun SignInScreenContent(signIn : (String, String) -> Unit, onToCreateAccount : (
         }
     }
 }
-//

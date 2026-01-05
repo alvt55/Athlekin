@@ -3,20 +3,22 @@ package com.example.athlekin.model
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 
+
+// firebase
 data class WorkoutDoc(
     @DocumentId val id: String = "",
-    val ownerId : String? = "",
+    val ownerId: String? = "",
     val createdAt: Timestamp = Timestamp.now(),
     val name: String = "",
     val exercises: List<Exercise> = emptyList()
 )
 
- 
+
 // UI 
 
 data class Workout(
     val id: String = "",
-    val ownerId : String? = "",
+    val ownerId: String? = "",
     val createdAt: Timestamp = Timestamp.now(),
     val name: String = "",
     val exercises: List<Exercise> = emptyList()
@@ -33,6 +35,6 @@ data class Exercise(
 data class TimeSlot(
     val startTime: Long = 0,
     val endTime: Long = 0,
-    val available : Boolean = false
+    val available: Boolean = false
 )
 
