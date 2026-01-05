@@ -12,6 +12,7 @@ import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
+import com.example.athlekin.ui.workouts.toWorkout
 import dagger.hilt.android.lifecycle.HiltViewModel
 
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +24,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.map
+import kotlin.collections.toSet
 
 
 // state about the entire workout
@@ -65,6 +68,19 @@ class TrackingViewModel @Inject constructor(
             )
 
 
+    val existingExercises = workoutsRepo.getWorkouts(authRepository.currentUserIdFlow)
+        .map { workouts ->
+            workouts.flatMap { it.exercises }   // get all exercises from all workouts
+                .map { it.name }                // extract their names
+                .toSet()                        // remove duplicates
+                .toList()                       // convert to list for autocomplete
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = emptyList()
+        )
+
     // updating the current exercise fields
     fun updateCurrentExerciseState(details: CurrExerciseState) {
         currExerciseState = details.copy(isEntryValid = validateInput(details))
@@ -82,6 +98,7 @@ class TrackingViewModel @Inject constructor(
 
     // update workout name field
     fun updateWorkoutName(name: String) {
+        println("existingExercises: $existingExercises")
 
         _uiState.update { currentState ->
             currentState.copy(

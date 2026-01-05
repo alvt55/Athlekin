@@ -1,20 +1,33 @@
 package com.example.athlekin.ui.tracker
 
 
+import android.R.attr.text
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +57,8 @@ fun TrackingScreen(
     val currExerciseState = viewModel.currExerciseState
     val exercises by viewModel.exercises.collectAsState()
 
+    val exerciseNames by viewModel.existingExercises.collectAsState()
+
 
 
     Row(modifier = Modifier.fillMaxSize()) {
@@ -69,15 +84,18 @@ fun TrackingScreen(
             }
 
             // Exercise name
-            TextField(
-                value = currExerciseState.name,
-                onValueChange = {
-                    viewModel.updateCurrentExerciseState(
-                        currExerciseState.copy(name = it)
-                    )
-                },
-                label = { Text(stringResource(R.string.exercise_input)) }
-            )
+//            TextField(
+//                value = currExerciseState.name,
+//                onValueChange = {
+//                    viewModel.updateCurrentExerciseState(
+//                        currExerciseState.copy(name = it)
+//                    )
+//                },
+//                label = { Text(stringResource(R.string.exercise_input)) }
+//            )
+
+
+
 
             // Sets + Reps
             Row {
@@ -152,6 +170,18 @@ fun TrackingScreen(
                 Text("To Calendar")
             }
 
+            // TODO - put this in the middle of screen, dropdown doesn't ovelay
+            AutofillTextField(
+                value = currExerciseState.name,
+                onValueChange = {
+                    viewModel.updateCurrentExerciseState(
+                        currExerciseState.copy(name = it)
+                    )
+                },
+                options = exerciseNames,
+                label = stringResource(R.string.exercise_input)
+            )
+
 
         }
 
@@ -162,3 +192,43 @@ fun TrackingScreen(
 
 }
 
+
+@Composable
+fun AutofillTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    options: List<String>,
+    label: String,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(modifier = modifier) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it)
+                expanded = it.isNotEmpty() && options.any { opt -> opt.startsWith(it, ignoreCase = true) }
+            },
+            label = { Text(label) },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        if (expanded) {
+            LazyColumn {
+                items(options.filter { it.startsWith(value, ignoreCase = true) }) { suggestion ->
+                    Text(
+                        text = suggestion,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                onValueChange(suggestion)
+                                expanded = false
+                            }
+                            .padding(8.dp)
+                    )
+                }
+            }
+        }
+    }
+}
