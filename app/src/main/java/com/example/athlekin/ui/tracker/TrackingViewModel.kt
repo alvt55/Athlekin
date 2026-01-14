@@ -7,14 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.WorkoutsRepo
-
 import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
-import com.example.athlekin.ui.workouts.toWorkout
 import dagger.hilt.android.lifecycle.HiltViewModel
-
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -24,8 +21,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.map
-import kotlin.collections.toSet
 
 
 // state about the entire workout
@@ -137,42 +132,51 @@ class TrackingViewModel @Inject constructor(
     // if user is authenticated, exercise list and name is not empty, add workout to Firestore
     //
     fun endWorkout() {
-        val ownerId = authRepository.currentUser?.uid
 
-        if (ownerId.isNullOrBlank()) {
-            _uiState.update { it.copy(errorMessage = "You must be signed in to save a workout.") }
-            return
-        }
+        viewModelScope.launch {
+            authRepository.currentUserIdFlow.collect { uid ->
 
-        if (exercises.value.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
-            // add workout based on UI fields
-            val workoutDocToAdd = WorkoutDoc(
-                ownerId = ownerId,
-                name = _uiState.value.workoutName,
-                exercises = exercises.value.map {
-                    Exercise(name = it.name, reps = it.reps, sets = it.sets) // room_id set to 0
-                }
-            )
+                println("uid: $uid")
 
-            viewModelScope.launch {
-                try {
-                    workoutsRepo.createWorkout(workoutDocToAdd)
+                if (uid.isNullOrBlank()) {
+                    _uiState.update { it.copy(errorMessage = "You must be signed in to save a workout.") }
+                } else {
+                    if (exercises.value.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
+                        // add workout based on UI fields
+                        val workoutDocToAdd = WorkoutDoc(
+                            ownerId = uid,
+                            name = _uiState.value.workoutName,
+                            exercises = exercises.value.map {
+                                Exercise(
+                                    name = it.name,
+                                    reps = it.reps,
+                                    sets = it.sets
+                                ) // room_id set to 0
+                            }
+                        )
 
-                    // reset UI state and local storage after adding
-                    offlineExercisesRepo.deleteAllExercises()
-                    _uiState.update { TrackerUiState() }
-                    currExerciseState = CurrExerciseState()
-                } catch (e: Exception) {
-                    // error saving workout
-                    _uiState.update { it.copy(errorMessage = "Failed to save workout: ${e.message}") }
+                        try {
+                            workoutsRepo.createWorkout(workoutDocToAdd)
+
+                            // reset UI state and local storage after adding
+                            offlineExercisesRepo.deleteAllExercises()
+                            _uiState.update { TrackerUiState() }
+                            currExerciseState = CurrExerciseState()
+                        } catch (e: Exception) {
+                            // error saving workout
+                            _uiState.update { it.copy(errorMessage = "Failed to save workout: ${e.message}") }
+                        }
+
+
+                    } else {
+                        // Missing workout name or exercises
+                        _uiState.update { it.copy(errorMessage = "Please enter a workout name and add at least one exercise.") }
+                    }
                 }
             }
-
-
-        } else {
-            // Missing workout name or exercises
-            _uiState.update { it.copy(errorMessage = "Please enter a workout name and add at least one exercise.") }
         }
+
+
     }
 
     // delete exercise from Room based on room_id

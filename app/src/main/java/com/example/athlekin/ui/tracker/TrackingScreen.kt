@@ -95,8 +95,6 @@ fun TrackingScreen(
 //            )
 
 
-
-
             // Sets + Reps
             Row {
                 NumberStepper(
@@ -208,7 +206,8 @@ fun AutofillTextField(
             value = value,
             onValueChange = {
                 onValueChange(it)
-                expanded = it.isNotEmpty() && options.any { opt -> opt.startsWith(it, ignoreCase = true) }
+                expanded =
+                    it.isNotEmpty() && options.any { opt -> opt.startsWith(it, ignoreCase = true) }
             },
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth()
