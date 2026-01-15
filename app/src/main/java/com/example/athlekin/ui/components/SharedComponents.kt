@@ -202,7 +202,7 @@ fun WorkoutList(workoutsList: List<Workout>, onDeleteClick: (String) -> Unit) {
             .padding(16.dp)
             .fillMaxWidth()
     ) {
-        items(workoutsList) { workout ->
+        items(workoutsList.reversed()) { workout ->
             // Workout name as a "header"
 
 

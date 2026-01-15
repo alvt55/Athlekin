@@ -19,6 +19,7 @@ class WorkoutsRemoteDataSource @Inject constructor(
             firestore
                 .collection(WORKOUTS_COLLECTION)
                 .whereEqualTo(OWNER_ID, ownerId)
+                .orderBy("createdAt", )
                 .dataObjects()
         }
     }
