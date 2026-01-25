@@ -14,6 +14,17 @@ data class WorkoutDoc(
 )
 
 
+// firebase and UI
+data class Exercise(
+    val roomId: Int = 0, // will be set to 0 when saved to Firebase, and reassigned when being updated
+    val name: String = "",
+    val reps: Int = 1,
+    val sets: Int = 1,
+    val weight: Int = 1,
+    val comments: String = ""
+)
+
+
 // UI 
 
 data class Workout(
@@ -24,13 +35,6 @@ data class Workout(
     val exercises: List<Exercise> = emptyList()
 )
 
-
-data class Exercise(
-    val roomId: Int = 0,
-    val name: String = "",
-    val reps: Int = 1,
-    val sets: Int = 1,
-)
 
 data class TimeSlot(
     val startTime: Long = 0,

@@ -34,6 +34,8 @@ data class CurrExerciseState(
     val name: String = "",
     val reps: Int = 1,
     val sets: Int = 1,
+    val weight: Int = 1,
+    val comments: String = "",
     val isEntryValid: Boolean = false,
 )
 
@@ -111,7 +113,9 @@ class TrackingViewModel @Inject constructor(
             val currExercise = ExerciseEntity(
                 name = currExerciseState.name,
                 reps = currExerciseState.reps,
-                sets = currExerciseState.sets
+                sets = currExerciseState.sets,
+                weight = currExerciseState.weight,
+                comments = currExerciseState.comments
             )
 
 
@@ -147,11 +151,7 @@ class TrackingViewModel @Inject constructor(
                             ownerId = uid,
                             name = _uiState.value.workoutName,
                             exercises = exercises.value.map {
-                                Exercise(
-                                    name = it.name,
-                                    reps = it.reps,
-                                    sets = it.sets
-                                ) // room_id set to 0
+                                it.copy(roomId = 0)  // explicitly reset it to 0
                             }
                         )
 
@@ -178,6 +178,9 @@ class TrackingViewModel @Inject constructor(
 
 
     }
+
+    // get back - room database migration, manually test functionality, plan out unit testing?
+
 
     // delete exercise from Room based on room_id
     fun deleteExercise(roomId: Int) {
@@ -206,7 +209,9 @@ class TrackingViewModel @Inject constructor(
             roomId = id,
             name = this.name,
             reps = this.reps,
-            sets = this.sets
+            sets = this.sets,
+            weight = this.weight,
+            comments = this.comments
         )
     }
 
