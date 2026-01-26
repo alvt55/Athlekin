@@ -24,6 +24,12 @@ class WorkoutsRemoteDataSource @Inject constructor(
         }
     }
 
+
+    // TODO
+//    fun getUserExercises(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
+//
+//    }
+
     suspend fun createWorkout(workoutDoc: WorkoutDoc): String {
         return firestore.collection(WORKOUTS_COLLECTION).add(workoutDoc).await().id
     }

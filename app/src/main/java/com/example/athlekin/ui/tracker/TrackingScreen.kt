@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -58,6 +59,14 @@ fun TrackingScreen(
     val exercises by viewModel.exercises.collectAsState()
 
     val exerciseNames by viewModel.existingExercises.collectAsState()
+
+
+    // TODO: add this
+    val workoutId = viewModel.workoutId
+
+    LaunchedEffect(workoutId) {
+        viewModel.initEditMode(workoutId)
+    }
 
 
 
