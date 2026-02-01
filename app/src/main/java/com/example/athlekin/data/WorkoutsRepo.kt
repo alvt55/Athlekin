@@ -8,7 +8,7 @@ import javax.inject.Inject
 interface WorkoutPageRepo {
     fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>>
     suspend fun createWorkout(workoutDoc: WorkoutDoc): String
-
+    suspend fun getWorkout(id: String): WorkoutDoc?
     suspend fun deleteWorkout(id: String)
 }
 
@@ -19,6 +19,11 @@ class WorkoutsRepo @Inject constructor(
     override fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
         return workoutsRemoteDataSource.getWorkouts(currentUserIdFlow)
     }
+
+    override suspend fun getWorkout(id: String): WorkoutDoc? {
+        return workoutsRemoteDataSource.getWorkout(id)
+    }
+
 
     // TODO
 //    override fun getUserExercises(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {

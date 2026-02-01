@@ -24,6 +24,16 @@ class WorkoutsRemoteDataSource @Inject constructor(
         }
     }
 
+   suspend fun getWorkout(id: String): WorkoutDoc? {
+        return firestore
+            .collection(WORKOUTS_COLLECTION)
+            .document(id)
+            .get()
+            .await()
+            .toObject(WorkoutDoc::class.java)
+
+    }
+
 
     // TODO
 //    fun getUserExercises(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {

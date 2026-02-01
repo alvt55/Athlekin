@@ -51,14 +51,13 @@ fun TrackingScreen(
     contentType: AthelkinContentType
 ) {
 
-    // StateFlow screen state
-    val workoutUiState by viewModel.uiState.collectAsState()
 
     // Compose state from ViewModel
-    val currExerciseState = viewModel.currExerciseState
+    val trackerUiState = viewModel.trackerUiState
+    val currExerciseState = trackerUiState.currExerciseState
     val exercises by viewModel.exercises.collectAsState()
 
-    val exerciseNames by viewModel.existingExercises.collectAsState()
+    val exerciseNames = emptyList<String>()
 
 
     // TODO: add this
@@ -131,7 +130,6 @@ fun TrackingScreen(
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = viewModel::addExercise,
-                enabled = currExerciseState.isEntryValid
             ) {
                 Text("Submit")
             }
@@ -146,7 +144,7 @@ fun TrackingScreen(
             // end workout section
             Column {
                 TextField(
-                    value = workoutUiState.workoutName,
+                    value = trackerUiState.workoutName,
                     onValueChange = { viewModel.updateWorkoutName(it) },
                     label = { Text(stringResource(R.string.workout_input)) }
                 )
@@ -157,8 +155,8 @@ fun TrackingScreen(
                     Text("End Workout")
                 }
 
-                if (workoutUiState.errorMessage != null) {
-                    Text("${workoutUiState.errorMessage}")
+                if (trackerUiState.errorMessage != null) {
+                    Text("${trackerUiState.errorMessage}")
                 }
 
             }

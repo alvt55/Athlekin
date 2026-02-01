@@ -106,7 +106,7 @@ class TrackingViewModel @Inject constructor(
 
     // REQUIRES: details is the exercise state to validate
     // EFFECTS: returns whether or not this exercise state can be inserted into the room database
-    fun validateInput(details: CurrExerciseState): Boolean {
+    fun validateCurrentExerciseState(details: CurrExerciseState = trackerUiState.currExerciseState): Boolean {
 //        return with(details) {
 //            name.isNotBlank() &&
 //                    reps > 0 &&
@@ -131,6 +131,7 @@ class TrackingViewModel @Inject constructor(
 
     // MODIFIES: trackerUiState, ExerciseDatabase (room)
     // EFFECTS: checks if the exercise is valid, and if so, adds to the room database, clears the current exercise ui state
+    // ERROR MESSAGES: when exercise is invalid
     fun addExercise() {
 
 //        if (currExerciseState.isEntryValid) {
@@ -161,6 +162,7 @@ class TrackingViewModel @Inject constructor(
     // EFFECTS: if authenticated and has a workout name and exercises, saves the workout to Firebase,
     //          clear the Room database and UI state
     //          if the workoutId exists, do update workout instead of create workout, clear the workoutId field
+    // ERROR MESSAGES: workout is invalid, user is not signed in, workout fails to save/update
     fun endWorkout() {
 
 //        viewModelScope.launch {
@@ -205,6 +207,7 @@ class TrackingViewModel @Inject constructor(
 
     // MODIFIES: ExerciseDatabase (room)
     // EFFECTS: delete exercise from Room based on room_id
+    // ERROR MESSAGE: issues with the Firebase deletion
     fun deleteExercise(roomId: Int) {
 //        viewModelScope.launch {
 //            offlineExercisesRepo.deleteExerciseById(roomId)
@@ -213,6 +216,7 @@ class TrackingViewModel @Inject constructor(
 
 
     // EFFECTS: calls signout function for auth repo
+    // ERROR MESSAGE: issues with the Firebase sign out
     fun signOut() {
 
 //        try {
