@@ -20,6 +20,7 @@ import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import java.security.Timestamp
 
 
 @ExperimentalCoroutinesApi
@@ -59,6 +60,8 @@ class TrackingViewModelTest {
         weight = 0
     )
 
+    val testUserId = "testUserId"
+
 
     @Before
     fun setUp() {
@@ -77,6 +80,11 @@ class TrackingViewModelTest {
                 Exercise(2, exerciseName2, rep2, set2, weight2, comment2)
             )
         )
+
+
+        coEvery { workoutsRepo.createWorkout(any())} returns "123"
+        coEvery { workoutsRepo.updateWorkout(any())} just runs
+
 
 
         every { offlineExercisesRepo.getAllExercisesStream() } returns flowOf(
@@ -209,34 +217,228 @@ class TrackingViewModelTest {
     }
 
 
-//    @Test
-//    fun endWorkout_ValidNewWorkout_SavesWorkoutToFirebaseAndClearsState() = runTest {
-//
-//        viewModel.updateCurrentExerciseState(validExerciseState)
-//        viewModel.updateWorkoutName("Test Workout")
-//
-//        viewModel.endWorkout()
-//        advanceUntilIdle()
-//
-//        // TODO: authentication mock
-//
-//        coVerify (exactly = 1){
-//            offlineExercisesRepo.deleteAllExercises()
-//            workoutsRepo.createWorkout(match {
-//                it.name == "Test Workout" &&
-//                        it.exercises.size == 2
-//            })
-//
-//        }
-//
-//
-//        assertEquals("", viewModel.trackerUiState.workoutName)
-//        assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
-//
-//
-//    }
+    @Test
+    fun endWorkout_ValidNewWorkout_SavesWorkoutToFirebaseAndClearsState() = runTest {
+
+        coEvery { authRepository.currentUserIdFlow } returns flowOf(testUserId)
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+        viewModel.addExercise()
+        viewModel.updateWorkoutName("Test Workout")
+
+        viewModel.endWorkout()
+        advanceUntilIdle()
 
 
+        coVerify (exactly = 1){
+            workoutsRepo.createWorkout(match {
+                it.name == "Test Workout" &&
+                        it.ownerId == testUserId &&
+                        it.exercises.size == 1 &&
+                        it.exercises[0].name == validExerciseState.name
+            })
+            offlineExercisesRepo.deleteAllExercises()
+
+
+        }
+
+
+        assertEquals("", viewModel.trackerUiState.workoutName)
+        assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
+        assertEquals(null, viewModel.trackerUiState.errorMessage)
+
+
+    }
+
+    @Test
+    fun endWorkout_InValidNewWorkout_ErrorMessageAndNoWorkoutSaved() = runTest {
+
+        coEvery { authRepository.currentUserIdFlow } returns flowOf(testUserId)
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+        viewModel.addExercise()
+        viewModel.updateWorkoutName("")
+
+        viewModel.endWorkout()
+        advanceUntilIdle()
+
+
+        coVerify(exactly = 0) { workoutsRepo.createWorkout(any()) }
+        coVerify(exactly = 0) { offlineExercisesRepo.deleteAllExercises() }
+
+
+        assertEquals("", viewModel.trackerUiState.workoutName)
+        assertEquals("Please enter a workout name and add at least one exercise", viewModel.trackerUiState.errorMessage)
+
+
+    }
+
+
+    @Test
+    fun endWorkout_UserNotSignedIn_ErrorMessageAndNoWorkoutSaved() = runTest {
+
+        coEvery { authRepository.currentUserIdFlow } returns flowOf("")
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+        viewModel.addExercise()
+        viewModel.updateWorkoutName("Test Workout")
+
+        viewModel.endWorkout()
+        advanceUntilIdle()
+
+
+        coVerify(exactly = 0) { workoutsRepo.createWorkout(any()) }
+        coVerify(exactly = 0) { offlineExercisesRepo.deleteAllExercises() }
+
+
+        assertEquals("", viewModel.trackerUiState.workoutName)
+        assertEquals("Please login first", viewModel.trackerUiState.errorMessage)
+
+
+    }
+
+
+    @Test
+    fun endWorkout_FirebaseErrorCreate_ErrorMessageAndNoUpdate() = runTest {
+
+        coEvery { authRepository.currentUserIdFlow } returns flowOf(testUserId)
+        coEvery {workoutsRepo.createWorkout(any())} throws Exception("Firebase error")
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+        viewModel.addExercise()
+        viewModel.updateWorkoutName("Test Workout")
+
+        viewModel.endWorkout()
+        advanceUntilIdle()
+
+
+        coVerify (exactly = 1){
+            workoutsRepo.createWorkout(match {
+                it.name == "Test Workout" &&
+                        it.ownerId == testUserId &&
+                        it.exercises.size == 1 &&
+                        it.exercises[0].name == validExerciseState.name
+            })
+
+        }
+
+        coVerify (exactly = 0) { offlineExercisesRepo.deleteAllExercises() }
+
+
+        assertEquals("Test Workout", viewModel.trackerUiState.workoutName)
+        assertEquals(validExerciseState, viewModel.trackerUiState.currExerciseState)
+        assertEquals("Error saving workout to database", viewModel.trackerUiState.errorMessage)
+
+
+    }
+
+    @Test
+    fun endWorkout_ValidEditWorkout_WorkoutUpdatedAndFieldsCleared() = runTest {
+
+        val workoutIdField = TrackingViewModel::class.java.getDeclaredField("workoutId")
+        workoutIdField.isAccessible = true
+        workoutIdField.set(viewModel, editWorkout.id)
+
+        coEvery { authRepository.currentUserIdFlow } returns flowOf(testUserId)
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+        viewModel.addExercise()
+        viewModel.updateWorkoutName("Test Workout")
+
+        viewModel.endWorkout()
+        advanceUntilIdle()
+
+
+        coVerify (exactly = 1){
+            workoutsRepo.updateWorkout(match {
+                it.id == editWorkout.id &&
+                it.name == "Test Workout" &&
+                        it.ownerId == testUserId &&
+                        it.exercises.size == 2
+            })
+            offlineExercisesRepo.deleteAllExercises()
+
+
+        }
+
+        assertEquals("", viewModel.workoutId)
+        assertEquals("", viewModel.trackerUiState.workoutName)
+        assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
+        assertEquals(null, viewModel.trackerUiState.errorMessage)
+
+    }
+
+
+
+    @Test
+    fun endWorkout_InvalidEditWorkoutId_ErrorMessageAndNoUpdate() = runTest {
+
+        val workoutIdField = TrackingViewModel::class.java.getDeclaredField("workoutId")
+        workoutIdField.isAccessible = true
+        workoutIdField.set(viewModel, "invalid-id")
+
+
+        coEvery { authRepository.currentUserIdFlow } returns flowOf(testUserId)
+
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+        viewModel.addExercise()
+        viewModel.updateWorkoutName("Test Workout")
+
+
+        coEvery {
+            workoutsRepo.updateWorkout(match { it.id == "invalid-id" })
+        } throws Exception("Invalid workout ID")
+
+
+        viewModel.endWorkout()
+        advanceUntilIdle()
+
+
+        coVerify(exactly = 0) { workoutsRepo.updateWorkout(any()) }
+
+
+        assertEquals("invalid-id", workoutIdField.get(viewModel)) // still invalid
+        assertEquals("Test Workout", viewModel.trackerUiState.workoutName) // workout name unchanged
+        assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState) // exercise state cleared
+        assertEquals(
+            "Invalid workout ID, cannot save changes",
+            viewModel.trackerUiState.errorMessage
+        )
+    }
+
+
+
+    @Test
+    fun endWorkout_FirebaseErrorEdit_ErrorMessageAndNoUpdate() = runTest {
+
+        coEvery { authRepository.currentUserIdFlow } returns flowOf(testUserId)
+        coEvery {workoutsRepo.updateWorkout(any())} throws Exception("Firebase error")
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+        viewModel.addExercise()
+        viewModel.updateWorkoutName("Test Workout")
+
+        viewModel.endWorkout()
+        advanceUntilIdle()
+
+
+        coVerify (exactly = 1){
+            workoutsRepo.createWorkout(match {
+                it.name == "Test Workout" &&
+                        it.ownerId == testUserId &&
+                        it.exercises.size == 2 &&
+                        it.exercises[0].name == validExerciseState.name
+            })
+
+        }
+
+        coVerify (exactly = 0) { offlineExercisesRepo.deleteAllExercises() }
+
+
+        assertEquals("Test Workout", viewModel.trackerUiState.workoutName)
+        assertEquals(validExerciseState, viewModel.trackerUiState.currExerciseState)
+        assertEquals("Error saving workout to database", viewModel.trackerUiState.errorMessage)
 
 
     }
@@ -245,4 +447,15 @@ class TrackingViewModelTest {
 
 
 
+
+
+
+
+
 }
+
+
+
+
+
+

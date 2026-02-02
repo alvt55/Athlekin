@@ -10,6 +10,7 @@ interface WorkoutPageRepo {
     suspend fun createWorkout(workoutDoc: WorkoutDoc): String
     suspend fun getWorkout(id: String): WorkoutDoc?
     suspend fun deleteWorkout(id: String)
+    suspend fun updateWorkout(workoutDoc: WorkoutDoc)
 }
 
 class WorkoutsRepo @Inject constructor(
@@ -25,10 +26,16 @@ class WorkoutsRepo @Inject constructor(
     }
 
 
+
     // TODO
 //    override fun getUserExercises(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
 //
 //    }
+
+    override suspend fun updateWorkout(workoutDoc: WorkoutDoc) {
+        workoutsRemoteDataSource.update(workoutDoc)
+    }
+
 
     override suspend fun createWorkout(workoutDoc: WorkoutDoc): String {
         return workoutsRemoteDataSource.createWorkout(workoutDoc)

@@ -40,6 +40,10 @@ class WorkoutsRemoteDataSource @Inject constructor(
 //
 //    }
 
+    suspend fun update(workoutDoc: WorkoutDoc) {
+        firestore.collection(WORKOUTS_COLLECTION).document(workoutDoc.id).set(workoutDoc).await()
+    }
+
     suspend fun createWorkout(workoutDoc: WorkoutDoc): String {
         return firestore.collection(WORKOUTS_COLLECTION).add(workoutDoc).await().id
     }
