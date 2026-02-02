@@ -1,5 +1,6 @@
 package com.example.athlekin.ui.test
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.WorkoutsRepo
 import com.example.athlekin.model.Exercise
@@ -42,6 +43,22 @@ class TrackingViewModelTest {
     private val weight2 = 0
     private val comment1 = "Test comment"
     private val comment2 = ""
+    val invalidWorkoutId = "987"
+
+    val validExerciseState = CurrExerciseState(
+        name = "test",
+        reps = 5,
+        sets = 3,
+        weight = 50
+    )
+
+    val invalidExerciseState = CurrExerciseState(
+        name = "",
+        reps = 1,
+        sets = 1,
+        weight = 0
+    )
+
 
     @Before
     fun setUp() {
@@ -69,7 +86,8 @@ class TrackingViewModelTest {
             )
         )
 
-        coEvery { workoutsRepo.getWorkout(any()) } returns editWorkout
+        coEvery { workoutsRepo.getWorkout(editWorkout.id) } returns editWorkout
+        coEvery { workoutsRepo.getWorkout(invalidWorkoutId) } returns null
 
         viewModel = TrackingViewModel(authRepository, workoutsRepo, offlineExercisesRepo)
     }
@@ -81,11 +99,12 @@ class TrackingViewModelTest {
     }
 
     @Test
-    fun initEditMode_ValidWorkoutId_LoadsWorkoutAndExercises() {
+    fun initEditMode_ValidWorkoutId_LoadsWorkoutAndExercises() = runTest {
 
 
 
         viewModel.initEditMode(editWorkout.id)
+        advanceUntilIdle()
 
         assertEquals(editWorkout.id, viewModel.workoutId)
         assertEquals(editWorkout.name, viewModel.trackerUiState.workoutName)
@@ -100,32 +119,129 @@ class TrackingViewModelTest {
     }
 
     @Test
+    fun initEditMode_InvalidWorkoutId_SetsErrorMessage() = runTest {
+
+        viewModel.initEditMode(invalidWorkoutId)
+        advanceUntilIdle()
+
+        assertEquals("", viewModel.workoutId)
+        assertEquals("", viewModel.trackerUiState.workoutName)
+        assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
+        assertEquals("Invalid Workout to Edit", viewModel.trackerUiState.errorMessage)
+
+        coVerify{ workoutsRepo.getWorkout(match { it == invalidWorkoutId }) }
+
+    }
+
+    @Test
+    fun updateCurrentExerciseState_ValidState_UpdatesState() {
+        assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+
+        assertEquals(validExerciseState, viewModel.trackerUiState.currExerciseState)
+    }
+
+    @Test
     fun validateCurrentExerciseState_ValidState_ReturnsTrue() {
-        val state = CurrExerciseState(
-            name = "Bench Press",
-            reps = 12,
-            sets = 3,
-            weight = 50
-        )
 
-        val result = viewModel.validateCurrentExerciseState(state)
-
+        val result = viewModel.validateCurrentExerciseState(validExerciseState)
         assertTrue(result)
     }
 
     @Test
     fun validateCurrentExerciseState_InvalidState_ReturnsFalse() {
-        val state = CurrExerciseState(
-            name = "",
-            reps = 0,
-            sets = 3,
-            weight = 50
-        )
 
-        val result = viewModel.validateCurrentExerciseState(state)
+
+        val result = viewModel.validateCurrentExerciseState(invalidExerciseState)
 
         assertFalse(result)
     }
+
+    @Test
+    fun updateWorkoutName_ValidName_UpdatesState() {
+        assertEquals("", viewModel.trackerUiState.workoutName)
+
+        val name = "Test Workout"
+
+        viewModel.updateWorkoutName(name)
+
+        assertEquals(name, viewModel.trackerUiState.workoutName)
+    }
+
+    @Test
+    fun addExercise_ValidExerciseState_AddsExerciseToRoom() = runTest {
+
+        viewModel.updateCurrentExerciseState(validExerciseState)
+
+        viewModel.addExercise()
+        advanceUntilIdle()
+
+        coVerify (exactly = 1){
+            offlineExercisesRepo.createExercise(match {
+                it.name == validExerciseState.name &&
+                        it.reps == validExerciseState.reps &&
+                        it.sets == validExerciseState.sets &&
+                        it.weight == validExerciseState.weight &&
+                        it.comments == validExerciseState.comments
+            })
+        }
+
+        assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
+
+    }
+
+
+    @Test
+    fun addExercise_InvalidExerciseState_NoRoomInsertionsAndErrorMessage() = runTest {
+
+        viewModel.updateCurrentExerciseState(invalidExerciseState)
+
+        viewModel.addExercise()
+        advanceUntilIdle()
+
+        coVerify (exactly = 0){
+            offlineExercisesRepo.createExercise(any())
+        }
+
+        assertEquals(invalidExerciseState, viewModel.trackerUiState.currExerciseState)
+        assertEquals("Invalid Exercise", viewModel.trackerUiState.errorMessage)
+    }
+
+
+//    @Test
+//    fun endWorkout_ValidNewWorkout_SavesWorkoutToFirebaseAndClearsState() = runTest {
+//
+//        viewModel.updateCurrentExerciseState(validExerciseState)
+//        viewModel.updateWorkoutName("Test Workout")
+//
+//        viewModel.endWorkout()
+//        advanceUntilIdle()
+//
+//        // TODO: authentication mock
+//
+//        coVerify (exactly = 1){
+//            offlineExercisesRepo.deleteAllExercises()
+//            workoutsRepo.createWorkout(match {
+//                it.name == "Test Workout" &&
+//                        it.exercises.size == 2
+//            })
+//
+//        }
+//
+//
+//        assertEquals("", viewModel.trackerUiState.workoutName)
+//        assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
+//
+//
+//    }
+
+
+
+
+    }
+
+
 
 
 
