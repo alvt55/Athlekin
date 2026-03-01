@@ -133,19 +133,20 @@ class TrackingViewModel @Inject constructor(
     // MODIFIES: trackerUiState
     // EFFECTS: overwrite the viewmodel state to update the current exercise state
     fun updateCurrentExerciseState(details: CurrExerciseState) {
-//        currExerciseState = details.copy(isEntryValid = validateInput(details))
+        trackerUiState = trackerUiState.copy(currExerciseState = details)
     }
 
     // REQUIRES: details is the exercise state to validate
     // EFFECTS: returns whether or not this exercise state can be inserted into the room database
     fun validateCurrentExerciseState(details: CurrExerciseState = trackerUiState.currExerciseState): Boolean {
-//        return with(details) {
-//            name.isNotBlank() &&
-//                    reps > 0 &&
-//                    sets > 0
-//        }
+        return with(details) {
+            name.isNotBlank() &&
+                    reps > 0 &&
+                    sets > 0 &&
+                    weight > 0
+        }
 
-        return false
+
     }
 
 
