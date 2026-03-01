@@ -11,6 +11,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.time.Instant
+import java.time.ZoneId
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -37,7 +39,7 @@ class CalendarRepo @Inject constructor(
 
     // takes in start and end boundaries - computes the best timeslot based on past workouts
     // TODO: handle date picker time zones
-    suspend fun queryCalendars(start: Long, end: Long) {
+    suspend fun queryCalendars(start: Long, end: Long) : Pair<Long, Long>? {
 
 
         // stores time slots that a user has events occuring
@@ -85,6 +87,8 @@ class CalendarRepo @Inject constructor(
             }
         }
 
+        print("busy slots: $busySlots")
+
         val timeSlots = findAvailableSlots(busySlots, start, end)
 
         if (timeSlots.isNotEmpty()) {
@@ -112,10 +116,15 @@ class CalendarRepo @Inject constructor(
                 }
             }
 
-            println(bestScore)
+
+            return if (bestScore.second > 0.0) bestScore.first else null
 
 
         }
+
+        return null
+
+
 
 
     }

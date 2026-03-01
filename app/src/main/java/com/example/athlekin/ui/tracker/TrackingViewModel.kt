@@ -5,23 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.WorkoutsRepo
 import com.example.athlekin.model.Exercise
-import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.jetbrains.annotations.VisibleForTesting
 import javax.inject.Inject
 
 
@@ -70,7 +64,7 @@ class TrackingViewModel @Inject constructor(
                 initialValue = emptyList()
             )
 
-    var workoutId by mutableStateOf("")
+    var workoutEditId by mutableStateOf("")
         private set
 
 
@@ -79,6 +73,43 @@ class TrackingViewModel @Inject constructor(
     // EFFECTS: overwrites the TrackerUiState with the workout, overwrites the room database with the workout's exercises,
     //          remember the workoutId in this viewModel state
     fun initEditMode(workoutId: String) {
+
+        if (workoutId.isNotBlank()) {
+
+
+
+
+            viewModelScope.launch {
+                val workout = workoutsRepo.getWorkout(workoutId)
+
+                if (workout != null) {
+                    workoutEditId = workoutId
+                    trackerUiState = trackerUiState.copy(
+                        workoutName = workout.name,
+                        currExerciseState = CurrExerciseState()
+                    )
+
+                    offlineExercisesRepo.deleteAllExercises()
+
+                    workout.exercises.map { exercise ->
+                        offlineExercisesRepo.createExercise(
+                            ExerciseEntity(
+                                name = exercise.name,
+                                reps = exercise.reps,
+                                sets = exercise.sets,
+                                weight = exercise.weight,
+                                comments = exercise.comments
+                            )
+                        )
+
+                    }
+                } else {
+                    trackerUiState = trackerUiState.copy(errorMessage = "Invalid Workout to Edit")
+                }
+
+
+            }
+        }
 
     }
 

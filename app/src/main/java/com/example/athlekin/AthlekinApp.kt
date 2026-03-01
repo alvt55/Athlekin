@@ -66,14 +66,14 @@ fun AthlekinApp(
 
         NavHost(
             navController = navController,
-            startDestination = AthelkinScreen.Tracking.name,
+            startDestination = AthelkinScreen.SignIn.name,
             modifier = Modifier.Companion.padding(innerPadding)
         ) {
             composable(route = AthelkinScreen.SignIn.name) {
                 val viewModel = hiltViewModel<SignInViewModel>()
 
                 SignInScreen(
-                    openTrackerScreen = { navController.navigate(AthelkinScreen.Tracking.name) },
+                    openTrackerScreen = { navController.navigate(AthelkinScreen.Calendar.name) },
                     onToCreateAccount = { navController.navigate(AthelkinScreen.CreateAccount.name) },
                     viewModel = viewModel
                 )

@@ -1,6 +1,5 @@
 package com.example.athlekin.ui.test
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.WorkoutsRepo
 import com.example.athlekin.model.Exercise
@@ -20,7 +19,6 @@ import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
-import java.security.Timestamp
 
 
 @ExperimentalCoroutinesApi
@@ -69,7 +67,7 @@ class TrackingViewModelTest {
 
         authRepository = mockk(relaxed = true)
         workoutsRepo = mockk(relaxed = true)
-        offlineExercisesRepo = mockk()
+        offlineExercisesRepo = mockk(relaxed = true)
 
         editWorkout = WorkoutDoc(
             id = "123",
@@ -98,6 +96,9 @@ class TrackingViewModelTest {
         coEvery { workoutsRepo.getWorkout(invalidWorkoutId) } returns null
 
         viewModel = TrackingViewModel(authRepository, workoutsRepo, offlineExercisesRepo)
+
+        coEvery {offlineExercisesRepo.deleteAllExercises()} just runs
+        coEvery { offlineExercisesRepo.createExercise(any()) } just Runs
     }
 
     @After
@@ -114,7 +115,7 @@ class TrackingViewModelTest {
         viewModel.initEditMode(editWorkout.id)
         advanceUntilIdle()
 
-        assertEquals(editWorkout.id, viewModel.workoutId)
+        assertEquals(editWorkout.id, viewModel.workoutEditId)
         assertEquals(editWorkout.name, viewModel.trackerUiState.workoutName)
         assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
         assertEquals(null, viewModel.trackerUiState.errorMessage)
@@ -132,7 +133,7 @@ class TrackingViewModelTest {
         viewModel.initEditMode(invalidWorkoutId)
         advanceUntilIdle()
 
-        assertEquals("", viewModel.workoutId)
+        assertEquals("", viewModel.workoutEditId)
         assertEquals("", viewModel.trackerUiState.workoutName)
         assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
         assertEquals("Invalid Workout to Edit", viewModel.trackerUiState.errorMessage)
@@ -361,7 +362,7 @@ class TrackingViewModelTest {
 
         }
 
-        assertEquals("", viewModel.workoutId)
+        assertEquals("", viewModel.workoutEditId)
         assertEquals("", viewModel.trackerUiState.workoutName)
         assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
         assertEquals(null, viewModel.trackerUiState.errorMessage)
