@@ -152,13 +152,7 @@ class TrackingViewModel @Inject constructor(
 
     // EFFECTS: updates the workout name for this session
     fun updateWorkoutName(name: String) {
-//        println("existingExercises: $existingExercises")
-//
-//        _uiState.update { currentState ->
-//            currentState.copy(
-//                workoutName = name
-//            )
-//        }
+        trackerUiState = trackerUiState.copy(workoutName = name)
     }
 
 
@@ -167,26 +161,31 @@ class TrackingViewModel @Inject constructor(
     // ERROR MESSAGES: when exercise is invalid
     fun addExercise() {
 
-//        if (currExerciseState.isEntryValid) {
-//            val currExercise = ExerciseEntity(
-//                name = currExerciseState.name,
-//                reps = currExerciseState.reps,
-//                sets = currExerciseState.sets,
-//                weight = currExerciseState.weight,
-//                comments = currExerciseState.comments
-//            )
-//
-//
-//            viewModelScope.launch {
-//                offlineExercisesRepo.createExercise(
-//                    currExercise
-//                )
-//            }
-//
-//
-//            // reset input fields
-//            currExerciseState = CurrExerciseState()
-//        }
+        if (validateCurrentExerciseState(trackerUiState.currExerciseState)) {
+
+            val currExerciseState = trackerUiState.currExerciseState
+
+            val currExercise = ExerciseEntity(
+                name = currExerciseState.name,
+                reps = currExerciseState.reps,
+                sets = currExerciseState.sets,
+                weight = currExerciseState.weight,
+                comments = currExerciseState.comments
+            )
+
+
+            viewModelScope.launch {
+                offlineExercisesRepo.createExercise(
+                    currExercise
+                )
+            }
+
+
+            // reset input fields
+            trackerUiState = trackerUiState.copy(currExerciseState = CurrExerciseState())
+        } else {
+            trackerUiState = trackerUiState.copy(errorMessage = "Invalid Exercise")
+        }
 
 
     }
