@@ -1,5 +1,6 @@
 package com.example.athlekin.ui.tracker
 
+import android.util.Log.e
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,11 +9,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.WorkoutsRepo
 import com.example.athlekin.model.Exercise
+import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.WhileSubscribed
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -60,8 +64,9 @@ class TrackingViewModel @Inject constructor(
             .map { list -> list.map { it.toExercise() } }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
+                started = SharingStarted.Eagerly,
                 initialValue = emptyList()
+
             )
 
     var workoutEditId by mutableStateOf("")
@@ -75,9 +80,6 @@ class TrackingViewModel @Inject constructor(
     fun initEditMode(workoutId: String) {
 
         if (workoutId.isNotBlank()) {
-
-
-
 
             viewModelScope.launch {
                 val workout = workoutsRepo.getWorkout(workoutId)
@@ -197,43 +199,55 @@ class TrackingViewModel @Inject constructor(
     // ERROR MESSAGES: workout is invalid, user is not signed in, workout fails to save/update
     fun endWorkout() {
 
-//        viewModelScope.launch {
-//            authRepository.currentUserIdFlow.collect { uid ->
-//
-//                println("uid: $uid")
-//
-//                if (uid.isNullOrBlank()) {
-////                    _uiState.update { it.copy(errorMessage = "You must be signed in to save a workout.") }
-//                } else {
-//                    if (exercises.value.isNotEmpty() && _uiState.value.workoutName.isNotBlank()) {
-//                        // add workout based on UI fields
-//                        val workoutDocToAdd = WorkoutDoc(
-//                            ownerId = uid,
-//                            name = _uiState.value.workoutName,
-//                            exercises = exercises.value.map {
-//                                it.copy(roomId = 0)  // explicitly reset it to 0
-//                            }
-//                        )
-//
-//                        try {
-//                            workoutsRepo.createWorkout(workoutDocToAdd)
-//
-//                            // reset UI state and local storage after adding
-//                            offlineExercisesRepo.deleteAllExercises()
-////                            _uiState.update { TrackerUiState() }
-//                            currExerciseState = CurrExerciseState()
-//                        } catch (e: Exception) {
-//                            // error saving workout
-////                            _uiState.update { it.copy(errorMessage = "Failed to save workout: ${e.message}") }
-//                        }
-//
-//
-//                    } else {
-//                        // Missing workout name or exercises
-////                        _uiState.update { it.copy(errorMessage = "Please enter a workout name and add at least one exercise.") }
-//                    }
-//                }
-//            }
+        viewModelScope.launch {
+            val uid = authRepository.currentUserIdFlow.first()
+
+                if (uid.isNullOrBlank()) {
+
+                    trackerUiState = trackerUiState.copy(errorMessage = "Please login first")
+                } else {
+                    if (exercises.value.isNotEmpty() && trackerUiState.workoutName.isNotBlank()) {
+                        // add workout based on UI fields
+                        val workoutDocToAdd = WorkoutDoc(
+                            ownerId = uid,
+                            name = trackerUiState.workoutName,
+                            exercises = exercises.value.map {
+                                it.copy(roomId = 0)  // explicitly reset it to 0
+                            }
+                        )
+
+                        try {
+
+
+                            if (workoutEditId.isNotBlank() && workoutsRepo.getWorkout(workoutEditId) != null) {
+                                workoutsRepo.updateWorkout(workoutDocToAdd.copy(id = workoutEditId))
+                                workoutEditId = ""
+                            } else {
+                                workoutsRepo.createWorkout(workoutDocToAdd)
+                            }
+
+                            // reset UI state and local storage after adding
+                            offlineExercisesRepo.deleteAllExercises()
+                            trackerUiState = trackerUiState.copy(
+                                workoutName = "",
+                                currExerciseState = CurrExerciseState(),
+                                errorMessage = null
+                            )
+                        } catch (e: Exception) {
+                            // error saving workout
+                            trackerUiState =
+                                trackerUiState.copy(errorMessage = "Error saving workout to database")
+                        }
+
+
+                    } else {
+                        // Missing workout name or exercises
+                        trackerUiState =
+                            trackerUiState.copy(errorMessage = "Please enter a workout name and add at least one exercise")
+                    }
+                }
+            }
+
     }
 
 
