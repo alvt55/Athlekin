@@ -168,6 +168,7 @@ fun ExerciseItem(
                 )
                 Text(text = exercise.sets.toString(), modifier = Modifier.weight(1f))
                 Text(text = exercise.name, modifier = Modifier.weight(3f))
+                Text(text = exercise.weight.toString(), modifier = Modifier.weight(1f))
                 ExpandButton(expanded = expanded, onClick = { expanded = !expanded })
 
             }
@@ -179,6 +180,10 @@ fun ExerciseItem(
                 ) {
                     Text(
                         text = "Total volume: ${exercise.reps * exercise.sets}",
+                        style = MaterialTheme.typography.labelSmall
+                    )
+                    Text(
+                        text = "Comments: ${exercise.comments}",
                         style = MaterialTheme.typography.labelSmall
                     )
                     Button(

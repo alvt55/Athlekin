@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.WorkoutsRepo
 import com.example.athlekin.model.Exercise
@@ -124,6 +125,22 @@ class TrackingViewModel @Inject constructor(
 //            started = SharingStarted.WhileSubscribed(5_000),
 //            initialValue = emptyList()
 //        )
+
+    var existingExercises: StateFlow<List<String>>? = null
+
+    init {
+        viewModelScope.launch {
+            existingExercises = workoutsRepo.getExerciseNames(authRepository.currentUserIdFlow)
+                .stateIn(
+                    scope = viewModelScope,
+                    started = SharingStarted.WhileSubscribed(5_000),
+                    initialValue = emptyList()
+                )
+        }
+    }
+
+    // TODO: fix functionality of exercise names for autofill
+    // TODO: implement edit functionality with UI
 
 
     // MODIFIES: trackerUiState

@@ -1,6 +1,7 @@
 package com.example.athlekin
 
 import SignInScreen
+import android.R.attr.name
 import android.R.attr.type
 import android.content.Context
 import android.content.Intent
@@ -73,7 +74,7 @@ fun AthlekinApp(
                 val viewModel = hiltViewModel<SignInViewModel>()
 
                 SignInScreen(
-                    openTrackerScreen = { navController.navigate(AthelkinScreen.Calendar.name) },
+                    openTrackerScreen = { navController.navigate(AthelkinScreen.Tracking.name) },
                     onToCreateAccount = { navController.navigate(AthelkinScreen.CreateAccount.name) },
                     viewModel = viewModel
                 )

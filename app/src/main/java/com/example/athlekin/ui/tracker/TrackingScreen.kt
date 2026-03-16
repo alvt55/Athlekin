@@ -1,7 +1,9 @@
 package com.example.athlekin.ui.tracker
 
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,7 +35,10 @@ import com.example.athlekin.R
 import com.example.athlekin.ui.components.ExerciseList
 import com.example.athlekin.ui.components.NumberStepper
 import com.example.athlekin.ui.utils.AthelkinContentType
-
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.platform.LocalFocusManager
 
 @Composable
 fun TrackingScreen(
@@ -53,6 +58,9 @@ fun TrackingScreen(
 
     val exerciseNames = emptyList<String>()
 
+    var isFocused by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
+
 
     // TODO: add this
     val workoutId = viewModel.workoutEditId
@@ -63,7 +71,12 @@ fun TrackingScreen(
 
 
 
-    Row(modifier = Modifier.fillMaxSize()) {
+    Row(modifier = Modifier.fillMaxSize().clickable(
+            indication = null,
+        interactionSource = remember { MutableInteractionSource() }
+    ) {
+        focusManager.clearFocus()
+    }) {
 
         Column(
             modifier = modifier
@@ -85,20 +98,10 @@ fun TrackingScreen(
                 Text(text = "Sign Out")
             }
 
-            // Exercise name
-//            TextField(
-//                value = currExerciseState.name,
-//                onValueChange = {
-//                    viewModel.updateCurrentExerciseState(
-//                        currExerciseState.copy(name = it)
-//                    )
-//                },
-//                label = { Text(stringResource(R.string.exercise_input)) }
-//            )
 
 
-            // Sets + Reps
-            Row {
+            // Exercise Input fields
+            Column {
                 NumberStepper(
                     value = currExerciseState.sets,
                     onValueChange = {
@@ -118,6 +121,40 @@ fun TrackingScreen(
                     },
                     label = "Reps"
                 )
+
+                OutlinedTextField(
+                    value = currExerciseState.weight.toString(),
+                    onValueChange = { input ->
+                        val number = input.toIntOrNull()
+                        if (number != null || input.isEmpty()) {
+                            viewModel.updateCurrentExerciseState(
+                                currExerciseState.copy(weight = number ?: 0)
+                            )
+                        }
+                    },
+                    label = { Text("Weight") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+
+                OutlinedTextField(
+                    value = currExerciseState.comments,
+                    onValueChange = {
+                        viewModel.updateCurrentExerciseState(
+                            currExerciseState.copy(comments = it)
+                        )
+                    },
+                    label = { Text("Comments") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateContentSize()
+                        .onFocusChanged { isFocused = it.isFocused },
+                    minLines = if (isFocused) 4 else 1,
+                    maxLines = 6
+                )
+
+
             }
 
 
@@ -150,7 +187,7 @@ fun TrackingScreen(
                 }
 
                 if (trackerUiState.errorMessage != null) {
-                    Text("${trackerUiState.errorMessage}")
+                    Text(trackerUiState.errorMessage)
                 }
 
             }

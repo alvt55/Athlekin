@@ -3,6 +3,7 @@ package com.example.athlekin.data
 import com.example.athlekin.datasource.WorkoutsRemoteDataSource
 import com.example.athlekin.model.WorkoutDoc
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface WorkoutPageRepo {
@@ -11,6 +12,9 @@ interface WorkoutPageRepo {
     suspend fun getWorkout(id: String): WorkoutDoc?
     suspend fun deleteWorkout(id: String)
     suspend fun updateWorkout(workoutDoc: WorkoutDoc)
+
+    suspend fun getExerciseNames(userIdFlow: Flow<String?>): Flow<List<String>>
+
 }
 
 class WorkoutsRepo @Inject constructor(
@@ -25,12 +29,16 @@ class WorkoutsRepo @Inject constructor(
         return workoutsRemoteDataSource.getWorkout(id)
     }
 
+    override suspend fun getExerciseNames(userIdFlow: Flow<String?>): Flow<List<String>> {
+        return getWorkouts(userIdFlow).map { workouts ->
+            workouts
+                .flatMap { it.exercises }   // get all exercises from all workouts
+                .map { it.name }            // extract exercise names
+                .toSet()                    // remove duplicates
+                .toList()                   // convert to list
+        }
+    }
 
-
-    // TODO
-//    override fun getUserExercises(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
-//
-//    }
 
     override suspend fun updateWorkout(workoutDoc: WorkoutDoc) {
         workoutsRemoteDataSource.update(workoutDoc)
