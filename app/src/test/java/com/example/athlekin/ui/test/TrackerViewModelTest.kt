@@ -58,7 +58,7 @@ class TrackingViewModelTest {
         name = "",
         reps = 1,
         sets = 1,
-        weight = 0
+        weight = 1
     )
 
     val testUserId = "testUserId"
@@ -193,6 +193,7 @@ class TrackingViewModelTest {
         }
 
         assertEquals(CurrExerciseState(), viewModel.trackerUiState.currExerciseState)
+        assertEquals(null, viewModel.trackerUiState.errorMessage)
 
     }
 
@@ -440,6 +441,35 @@ class TrackingViewModelTest {
 
 
     }
+
+    @Test
+    fun deleteExercise_ValidDelete_ErrorMessageAndNoUpdate() = runTest {
+
+        coEvery {offlineExercisesRepo.deleteExerciseById(any())} just runs
+
+
+        viewModel.deleteExercise(1)
+        advanceUntilIdle()
+
+        coVerify { offlineExercisesRepo.deleteExerciseById(1) }
+
+    }
+
+    @Test
+    fun deleteExercise_RoomDBErrors_ErrorMessageAndNoUpdate() = runTest {
+
+        coEvery {offlineExercisesRepo.deleteExerciseById(any())} throws Exception("room error")
+
+        viewModel.deleteExercise(1)
+        advanceUntilIdle()
+
+        coVerify { offlineExercisesRepo.deleteExerciseById(1) }
+        assertEquals("Error deleting exercise", viewModel.trackerUiState.errorMessage)
+
+    }
+
+
+
 
 
 

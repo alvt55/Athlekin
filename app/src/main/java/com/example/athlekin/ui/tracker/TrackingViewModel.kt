@@ -40,12 +40,6 @@ data class CurrExerciseState(
 )
 
 
-// TODO: change TrackerUiState into a mutableStateOf
-// TODO: remove isEntryValid, addExercise() should just check and return error message
-// TODO: put existing exercises in WorkoutsRepo (don't implement)
-// TODO: accommodate for update workout (most likely using this viewmodel but a new route)
-// TODO: implementation comments for all functions, verify through ai
-
 @HiltViewModel
 class TrackingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -144,8 +138,7 @@ class TrackingViewModel @Inject constructor(
         return with(details) {
             name.isNotBlank() &&
                     reps > 0 &&
-                    sets > 0 &&
-                    weight > 0
+                    sets > 0
         }
 
 
@@ -184,7 +177,7 @@ class TrackingViewModel @Inject constructor(
 
 
             // reset input fields
-            trackerUiState = trackerUiState.copy(currExerciseState = CurrExerciseState())
+            trackerUiState = trackerUiState.copy(currExerciseState = CurrExerciseState(), errorMessage = null)
         } else {
             trackerUiState = trackerUiState.copy(errorMessage = "Invalid Exercise")
         }
@@ -255,9 +248,15 @@ class TrackingViewModel @Inject constructor(
     // EFFECTS: delete exercise from Room based on room_id
     // ERROR MESSAGE: issues with the Firebase deletion
     fun deleteExercise(roomId: Int) {
-//        viewModelScope.launch {
-//            offlineExercisesRepo.deleteExerciseById(roomId)
-//        }
+        viewModelScope.launch {
+
+            try {
+                offlineExercisesRepo.deleteExerciseById(roomId)
+            } catch (e: Exception) {
+                trackerUiState = trackerUiState.copy(errorMessage = "Error deleting exercise")
+            }
+
+        }
     }
 
 
@@ -265,11 +264,11 @@ class TrackingViewModel @Inject constructor(
     // ERROR MESSAGE: issues with the Firebase sign out
     fun signOut() {
 
-//        try {
-//            authRepository.signOut()
-//        } catch (e: Exception) {
-////            _uiState.update { it.copy(errorMessage = "Failed to sign out: ${e.message}") }
-//        }
+        try {
+            authRepository.signOut()
+        } catch (e: Exception) {
+            trackerUiState = trackerUiState.copy(errorMessage = "Error signing out")
+        }
 
     }
 
