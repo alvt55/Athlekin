@@ -2,6 +2,7 @@ package com.example.athlekin.datasource
 
 import com.example.athlekin.model.WorkoutDoc
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.dataObjects
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,7 @@ class WorkoutsRemoteDataSource @Inject constructor(
             firestore
                 .collection(WORKOUTS_COLLECTION)
                 .whereEqualTo(OWNER_ID, ownerId)
-                .orderBy("createdAt", )
+                .orderBy("createdAt", Query.Direction.DESCENDING)
                 .dataObjects()
         }
     }

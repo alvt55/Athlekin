@@ -18,8 +18,11 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -67,6 +70,21 @@ class TrackingViewModel @Inject constructor(
     var workoutEditId by mutableStateOf("")
         private set
 
+    var pastExercisesList by mutableStateOf<List<Exercise>>(emptyList())
+        private set
+
+    init {
+        viewModelScope.launch {
+            val uid = authRepository.currentUserIdFlow.firstOrNull()
+            if (!uid.isNullOrBlank()) {
+                pastExercisesList =
+                    workoutsRepo.getUniqueRecentExercises(flowOf(uid)).first()
+                println("past exercises: $pastExercisesList") // debug
+            }
+        }
+    }
+
+
 
     // REQUIRES: workoutId is the Firebase id of the workout to edit, or empty string if not editing
     // MODIFIES: trackerUiState, workoutId, ExerciseDatabase (room)
@@ -111,36 +129,21 @@ class TrackingViewModel @Inject constructor(
     }
 
 
-    // for autofill feature
-    // move to workouts repo
-//    val existingExercises = workoutsRepo.getWorkouts(authRepository.currentUserIdFlow)
-//        .map { workouts ->
-//            workouts.flatMap { it.exercises }   // get all exercises from all workouts
-//                .map { it.name }                // extract their names
-//                .toSet()                        // remove duplicates
-//                .toList()                       // convert to list for autocomplete
+
+
+//    init {
+//        viewModelScope.launch {
+//            existingExercises = workoutsRepo.getExerciseNames(authRepository.currentUserIdFlow)
+//                .stateIn(
+//                    scope = viewModelScope,
+//                    started = SharingStarted.WhileSubscribed(5_000),
+//                    initialValue = emptyList()
+//                )
 //        }
-//        .stateIn(
-//            scope = viewModelScope,
-//            started = SharingStarted.WhileSubscribed(5_000),
-//            initialValue = emptyList()
-//        )
+//    }
 
-    var existingExercises: StateFlow<List<String>>? = null
 
-    init {
-        viewModelScope.launch {
-            existingExercises = workoutsRepo.getExerciseNames(authRepository.currentUserIdFlow)
-                .stateIn(
-                    scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(5_000),
-                    initialValue = emptyList()
-                )
-        }
-    }
 
-    // TODO: fix functionality of exercise names for autofill
-    // TODO: implement edit functionality with UI
 
 
     // MODIFIES: trackerUiState
@@ -190,7 +193,10 @@ class TrackingViewModel @Inject constructor(
                 offlineExercisesRepo.createExercise(
                     currExercise
                 )
+
             }
+
+
 
 
             // reset input fields

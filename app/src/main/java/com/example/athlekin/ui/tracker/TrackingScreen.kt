@@ -1,6 +1,8 @@
 package com.example.athlekin.ui.tracker
 
 
+
+import android.R.attr.name
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,6 +41,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.athlekin.model.Exercise
 
 @Composable
 fun TrackingScreen(
@@ -56,7 +60,7 @@ fun TrackingScreen(
     val currExerciseState = trackerUiState.currExerciseState
     val exercises by viewModel.exercises.collectAsState()
 
-    val exerciseNames = emptyList<String>()
+    val pastExerciseList : List<Exercise> = viewModel.pastExercisesList
 
     var isFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -214,8 +218,9 @@ fun TrackingScreen(
                         currExerciseState.copy(name = it)
                     )
                 },
-                options = exerciseNames,
-                label = stringResource(R.string.exercise_input)
+                options = pastExerciseList.map{e -> e.name},
+                label = stringResource(R.string.exercise_input),
+                viewModel = viewModel
             )
 
 
@@ -235,7 +240,9 @@ fun AutofillTextField(
     onValueChange: (String) -> Unit,
     options: List<String>,
     label: String,
+    viewModel : TrackingViewModel,
     modifier: Modifier = Modifier
+
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -259,7 +266,25 @@ fun AutofillTextField(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                onValueChange(suggestion)
+                                // fetch full exercise from ViewModel
+                                val exercise = viewModel.pastExercisesList.find { it.name.equals(suggestion, ignoreCase = true) }
+                                if (exercise != null) {
+                                    viewModel.updateCurrentExerciseState(
+                                        CurrExerciseState(
+                                            name = exercise.name,
+                                            sets = exercise.sets,
+                                            reps = exercise.reps,
+                                            weight = exercise.weight,
+                                            comments = exercise.comments
+                                        )
+                                    )
+                                } else {
+                                    // just set name if no past exercise exists
+                                    viewModel.updateCurrentExerciseState(
+                                        CurrExerciseState(name = suggestion)
+                                    )
+                                }
+
                                 expanded = false
                             }
                             .padding(8.dp)

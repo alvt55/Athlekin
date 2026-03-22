@@ -1,6 +1,7 @@
 package com.example.athlekin.data
 
 import com.example.athlekin.datasource.WorkoutsRemoteDataSource
+import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.WorkoutDoc
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -13,7 +14,7 @@ interface WorkoutPageRepo {
     suspend fun deleteWorkout(id: String)
     suspend fun updateWorkout(workoutDoc: WorkoutDoc)
 
-    suspend fun getExerciseNames(userIdFlow: Flow<String?>): Flow<List<String>>
+     fun getUniqueRecentExercises(currentUserIdFlow: Flow<String?>): Flow<List<Exercise>>
 
 }
 
@@ -29,13 +30,11 @@ class WorkoutsRepo @Inject constructor(
         return workoutsRemoteDataSource.getWorkout(id)
     }
 
-    override suspend fun getExerciseNames(userIdFlow: Flow<String?>): Flow<List<String>> {
-        return getWorkouts(userIdFlow).map { workouts ->
+    override fun getUniqueRecentExercises(currentUserIdFlow: Flow<String?>): Flow<List<Exercise>> {
+        return workoutsRemoteDataSource.getWorkouts(currentUserIdFlow).map { workouts ->
             workouts
-                .flatMap { it.exercises }   // get all exercises from all workouts
-                .map { it.name }            // extract exercise names
-                .toSet()                    // remove duplicates
-                .toList()                   // convert to list
+                .flatMap { it.exercises }
+                .distinctBy{it.name}
         }
     }
 
