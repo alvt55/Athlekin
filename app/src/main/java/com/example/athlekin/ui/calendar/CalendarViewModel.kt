@@ -21,6 +21,9 @@ class CalendarViewModel @Inject constructor(
     var showDateRangeModal by mutableStateOf<Boolean>(false)
     var errorMessage by mutableStateOf<String?>(null)
 
+    var slot by mutableStateOf<Pair<Long, Long>?>(null)
+
+
     // for now, just println the best available slot based on previous workouts
     fun getAvailableSlots() {
         val (start, end) = datePickerState
@@ -30,8 +33,10 @@ class CalendarViewModel @Inject constructor(
         }
         errorMessage = null
         viewModelScope.launch {
-            calendarRepo.queryCalendars(start, end)
+            slot = calendarRepo.queryCalendars(start, end)
         }
+
+
 
     }
 

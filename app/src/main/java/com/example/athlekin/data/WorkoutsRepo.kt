@@ -14,7 +14,9 @@ interface WorkoutPageRepo {
     suspend fun deleteWorkout(id: String)
     suspend fun updateWorkout(workoutDoc: WorkoutDoc)
 
-     fun getUniqueRecentExercises(currentUserIdFlow: Flow<String?>): Flow<List<Exercise>>
+    fun getExercisesByName(currentUserIdFlow: Flow<String?>): Flow<Map<String, List<Exercise>>>
+
+//     fun getUniqueRecentExercises(currentUserIdFlow: Flow<String?>): Flow<List<Exercise>>
 
 }
 
@@ -30,12 +32,23 @@ class WorkoutsRepo @Inject constructor(
         return workoutsRemoteDataSource.getWorkout(id)
     }
 
-    override fun getUniqueRecentExercises(currentUserIdFlow: Flow<String?>): Flow<List<Exercise>> {
-        return workoutsRemoteDataSource.getWorkouts(currentUserIdFlow).map { workouts ->
-            workouts
-                .flatMap { it.exercises }
-                .distinctBy{it.name}
-        }
+//    override fun getUniqueRecentExercises(currentUserIdFlow: Flow<String?>): Flow<List<Exercise>> {
+//        return workoutsRemoteDataSource.getWorkouts(currentUserIdFlow).map { workouts ->
+//            workouts
+//                .flatMap { it.exercises }
+//                .distinctBy{it.name}
+//        }
+//    }
+
+    override fun getExercisesByName(
+        currentUserIdFlow: Flow<String?>
+    ): Flow<Map<String, List<Exercise>>> {
+        return workoutsRemoteDataSource.getWorkouts(currentUserIdFlow)
+            .map { workouts ->
+                workouts
+                    .flatMap { it.exercises }
+                    .groupBy { it.name }
+            }
     }
 
 

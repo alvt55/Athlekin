@@ -3,12 +3,10 @@ package com.example.athlekin.ui.calendar
 import android.Manifest
 import android.util.Log
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.MaterialTheme
@@ -68,7 +66,7 @@ fun CalendarScreen(
         )
     }
 
-    Column {
+    Column(modifier = Modifier.padding(16.dp)) {
         Button(
             onClick = { viewModel.showDateRangeModal = true }
         ) {
@@ -76,39 +74,33 @@ fun CalendarScreen(
         }
 
         viewModel.errorMessage?.let {
-            Text(text = it, color = Color.Red)
+            Text(text = it, color = Color.Red, modifier = Modifier.padding(vertical = 8.dp))
         }
 
-//        viewModel.suggestedSlot?.let { slot ->
-//            val startTime = SimpleDateFormat("EEEE, MMM d @ h:mm a", Locale.getDefault())
-//                .format(Date(slot.first))
-//
-//            Card(
-//                modifier = Modifier
-//                    .padding(16.dp)
-//                    .fillMaxWidth()
-//            ) {
-//                Column(modifier = Modifier.padding(16.dp)) {
-//                    Text(
-//                        "AI Suggestion:",
-//                        style = MaterialTheme.typography.labelLarge
-//                    )
-//                    Text(
-//                        startTime,
-//                        style = MaterialTheme.typography.bodyLarge
-//                    )
-//                    Text("Does this time work for you?")
-//
-//                    Row {
-//                        TextButton(onClick = { viewModel.onFeedback(true) }) { Text("Yes") }
-//                        TextButton(onClick = { viewModel.onFeedback(false) }) { Text("No") }
-//                    }
-//                }
-//            }
-//        }
+        viewModel.slot?.let { (start, end) ->
+            val dateFormatter = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
+            val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
+            
+            Column(modifier = Modifier.padding(vertical = 16.dp)) {
+                Text(
+                    text = "Best available slot:",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Text(
+                    text = "${dateFormatter.format(Date(start))}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "${timeFormatter.format(Date(start))} - ${timeFormatter.format(Date(end))}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
 
         Button(
-            onClick = onToTrackingClicked
+            onClick = onToTrackingClicked,
+            modifier = Modifier.padding(top = 16.dp)
         ) {
             Text("To Tracking")
         }

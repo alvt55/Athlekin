@@ -106,7 +106,7 @@ class CalendarRepo @Inject constructor(
                 .eachCount()
 
 
-            // TODO: change formatting of the two Long dates to formatted based on locale time
+
             var bestScore: Pair<Pair<Long, Long>, Double> = Pair(Pair(0L, 0L), 0.0)
 
             for (slot in timeSlots) {

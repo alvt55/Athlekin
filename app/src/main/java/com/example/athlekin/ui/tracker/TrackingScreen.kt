@@ -2,7 +2,7 @@ package com.example.athlekin.ui.tracker
 
 
 
-import android.R.attr.name
+import android.R.attr.label
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -41,8 +41,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.model.Exercise
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 
 @Composable
 fun TrackingScreen(
@@ -60,7 +61,13 @@ fun TrackingScreen(
     val currExerciseState = trackerUiState.currExerciseState
     val exercises by viewModel.exercises.collectAsState()
 
-    val pastExerciseList : List<Exercise> = viewModel.pastExercisesList
+    val exercisesByName by viewModel.pastExercisesList.collectAsState()
+
+    val uniqueExerciseNames = exercisesByName
+        .groupBy { it.name }
+        .values
+        .map { it.last().name }
+
 
     var isFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -218,9 +225,10 @@ fun TrackingScreen(
                         currExerciseState.copy(name = it)
                     )
                 },
-                options = pastExerciseList.map{e -> e.name},
+                options = uniqueExerciseNames,
                 label = stringResource(R.string.exercise_input),
-                viewModel = viewModel
+                viewModel = viewModel,
+                exercisesByName = exercisesByName
             )
 
 
@@ -236,6 +244,7 @@ fun TrackingScreen(
 
 @Composable
 fun AutofillTextField(
+    exercisesByName : List<Exercise>,
     value: String,
     onValueChange: (String) -> Unit,
     options: List<String>,
@@ -267,7 +276,10 @@ fun AutofillTextField(
                             .fillMaxWidth()
                             .clickable {
                                 // fetch full exercise from ViewModel
-                                val exercise = viewModel.pastExercisesList.find { it.name.equals(suggestion, ignoreCase = true) }
+                                val exercise = exercisesByName.find {
+                                    it.name.equals(suggestion, ignoreCase = true)
+                                }
+
                                 if (exercise != null) {
                                     viewModel.updateCurrentExerciseState(
                                         CurrExerciseState(
@@ -278,6 +290,8 @@ fun AutofillTextField(
                                             comments = exercise.comments
                                         )
                                     )
+
+                                    // TODO: add a call to plateau logic here, displaying a popup
                                 } else {
                                     // just set name if no past exercise exists
                                     viewModel.updateCurrentExerciseState(
@@ -294,3 +308,5 @@ fun AutofillTextField(
         }
     }
 }
+
+private fun StateFlow<List<Exercise>>.find(function: () -> Boolean) {}

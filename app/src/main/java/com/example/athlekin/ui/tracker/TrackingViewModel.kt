@@ -13,12 +13,15 @@ import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
+import com.google.common.io.Files.map
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -70,19 +73,33 @@ class TrackingViewModel @Inject constructor(
     var workoutEditId by mutableStateOf("")
         private set
 
-    var pastExercisesList by mutableStateOf<List<Exercise>>(emptyList())
-        private set
-
-    init {
-        viewModelScope.launch {
-            val uid = authRepository.currentUserIdFlow.firstOrNull()
-            if (!uid.isNullOrBlank()) {
-                pastExercisesList =
-                    workoutsRepo.getUniqueRecentExercises(flowOf(uid)).first()
-                println("past exercises: $pastExercisesList") // debug
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val exercisesByName: StateFlow<Map<String, List<Exercise>>> =
+        authRepository.currentUserIdFlow
+            .flatMapLatest { uid ->
+                if (uid.isNullOrBlank()) {
+                    flowOf(emptyMap())
+                } else {
+                    workoutsRepo.getExercisesByName(flowOf(uid))
+                }
             }
-        }
-    }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = emptyMap()
+            )
+
+    val pastExercisesList: StateFlow<List<Exercise>> =
+        exercisesByName
+            .map { map ->
+                map.values.map { it.last() } // latest entry per exercise
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.WhileSubscribed(5000),
+                emptyList()
+            )
+
 
 
 
@@ -127,21 +144,6 @@ class TrackingViewModel @Inject constructor(
         }
 
     }
-
-
-
-
-//    init {
-//        viewModelScope.launch {
-//            existingExercises = workoutsRepo.getExerciseNames(authRepository.currentUserIdFlow)
-//                .stateIn(
-//                    scope = viewModelScope,
-//                    started = SharingStarted.WhileSubscribed(5_000),
-//                    initialValue = emptyList()
-//                )
-//        }
-//    }
-
 
 
 
