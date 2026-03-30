@@ -31,15 +31,6 @@ class WorkoutsRepo @Inject constructor(
     override suspend fun getWorkout(id: String): WorkoutDoc? {
         return workoutsRemoteDataSource.getWorkout(id)
     }
-
-//    override fun getUniqueRecentExercises(currentUserIdFlow: Flow<String?>): Flow<List<Exercise>> {
-//        return workoutsRemoteDataSource.getWorkouts(currentUserIdFlow).map { workouts ->
-//            workouts
-//                .flatMap { it.exercises }
-//                .distinctBy{it.name}
-//        }
-//    }
-
     override fun getExercisesByName(
         currentUserIdFlow: Flow<String?>
     ): Flow<Map<String, List<Exercise>>> {

@@ -201,6 +201,8 @@ fun TrackingScreen(
                     Text(trackerUiState.errorMessage)
                 }
 
+                Text(viewModel.plateauMessage)
+
             }
 
             Button(
@@ -292,6 +294,7 @@ fun AutofillTextField(
                                     )
 
                                     // TODO: add a call to plateau logic here, displaying a popup
+                                    viewModel.exercisePlateauMessage(exercise.name)
                                 } else {
                                     // just set name if no past exercise exists
                                     viewModel.updateCurrentExerciseState(

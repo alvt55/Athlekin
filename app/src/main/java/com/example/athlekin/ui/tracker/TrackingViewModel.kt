@@ -73,6 +73,7 @@ class TrackingViewModel @Inject constructor(
     var workoutEditId by mutableStateOf("")
         private set
 
+    // Exercise name : List of exercise objects with that name
     @OptIn(ExperimentalCoroutinesApi::class)
     val exercisesByName: StateFlow<Map<String, List<Exercise>>> =
         authRepository.currentUserIdFlow
@@ -89,6 +90,7 @@ class TrackingViewModel @Inject constructor(
                 initialValue = emptyMap()
             )
 
+    // list of exercise objects with the latest entry per exercise
     val pastExercisesList: StateFlow<List<Exercise>> =
         exercisesByName
             .map { map ->
@@ -99,6 +101,52 @@ class TrackingViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5000),
                 emptyList()
             )
+
+    var plateauMessage by mutableStateOf("")
+        private set
+
+
+    // REQUIRES: exercise name
+    // MODIFIES:
+    // EFFECTS: returns a personalized message based on history with that exercise
+    fun exercisePlateauMessage(name: String) {
+        val history = exercisesByName.value[name] ?: return
+
+        println("DEBUG: Plateau check for $name")
+        println("DEBUG: History size: ${history.size}")
+
+        // Need at least 3 sessions to determine a trend
+        if (history.size < 3) {
+            println("DEBUG: Not enough history for plateau detection")
+            return
+        }
+
+        // Calculate "Volume" for each session: weight * reps * sets
+        val volumes = history.map { it.weight.toDouble() * it.reps * it.sets }
+        println("DEBUG: Calculated volumes: $volumes")
+
+        val recent = volumes.takeLast(3)
+        val initialVolume = recent.first()
+        val finalVolume = recent.last()
+
+        println("DEBUG: Recent 3 volumes: $recent")
+        println("DEBUG: Comparing initial ($initialVolume) vs final ($finalVolume)")
+
+        if (initialVolume <= 0.0) {
+            println("DEBUG: Initial volume is 0, skipping calculation")
+            return
+        }
+
+        val percentageChange = (finalVolume - initialVolume) / initialVolume
+        println("DEBUG: Percentage change: ${String.format("%.2f", percentageChange * 100)}%")
+
+        // If increase is less than 5% over 3 sessions, consider it a plateau
+        if (percentageChange < 0.05) {
+            plateauMessage = "Plateau detected for $name. Volume growth is at ${(percentageChange * 100).toInt()}%. Consider changing reps or intensity!"
+        } else {
+            plateauMessage = "Great job! Your $name volume is up by ${(percentageChange * 100).toInt()}%."
+        }
+    }
 
 
 
@@ -311,9 +359,3 @@ class TrackingViewModel @Inject constructor(
 
 
 }
-
-
-
-
-
-
