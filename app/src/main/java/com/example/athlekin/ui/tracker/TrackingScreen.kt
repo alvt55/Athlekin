@@ -5,6 +5,7 @@ package com.example.athlekin.ui.tracker
 import android.R.attr.label
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -39,8 +41,10 @@ import com.example.athlekin.ui.components.NumberStepper
 import com.example.athlekin.ui.utils.AthelkinContentType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.athlekin.model.Exercise
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -62,7 +66,7 @@ fun TrackingScreen(
     val exercises by viewModel.exercises.collectAsState()
 
     // for autofill
-    val latestExercises by viewModel.pastExercisesList.collectAsState()
+    val latestExercises by viewModel.pastExercisesList.collectAsStateWithLifecycle()
 
     var isFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -77,12 +81,17 @@ fun TrackingScreen(
 
 
 
-    Row(modifier = Modifier.fillMaxSize().clickable(
-            indication = null,
-        interactionSource = remember { MutableInteractionSource() }
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        focusManager.clearFocus()
+                    }
+                )
+            }
     ) {
-        focusManager.clearFocus()
-    }) {
 
         Column(
             modifier = modifier
@@ -99,7 +108,7 @@ fun TrackingScreen(
                     onToSignIn()
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                shape = RoundedCornerShape(8.dp),
+                shape = RoundedCornerShape(2.dp),
             ) {
                 Text(text = "Sign Out")
             }
@@ -108,25 +117,28 @@ fun TrackingScreen(
 
             // Exercise Input fields
             Column {
-                NumberStepper(
-                    value = currExerciseState.sets,
-                    onValueChange = {
-                        viewModel.updateCurrentExerciseState(
-                            currExerciseState.copy(sets = it)
-                        )
-                    },
-                    label = "Sets"
-                )
+                Row{
+                    NumberStepper(
+                        value = currExerciseState.sets,
+                        onValueChange = {
+                            viewModel.updateCurrentExerciseState(
+                                currExerciseState.copy(sets = it)
+                            )
+                        },
+                        label = "Sets"
+                    )
 
-                NumberStepper(
-                    value = currExerciseState.reps,
-                    onValueChange = {
-                        viewModel.updateCurrentExerciseState(
-                            currExerciseState.copy(reps = it)
-                        )
-                    },
-                    label = "Reps"
-                )
+                    NumberStepper(
+                        value = currExerciseState.reps,
+                        onValueChange = {
+                            viewModel.updateCurrentExerciseState(
+                                currExerciseState.copy(reps = it)
+                            )
+                        },
+                        label = "Reps"
+                    )
+                }
+
 
                 OutlinedTextField(
                     value = currExerciseState.weight.toString(),
@@ -196,7 +208,7 @@ fun TrackingScreen(
                     Text(trackerUiState.errorMessage)
                 }
 
-                Text(viewModel.plateauMessage)
+//                Text(viewModel.plateauMessage)
 
             }
 
@@ -208,7 +220,7 @@ fun TrackingScreen(
             }
 
             Button(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().size(1.dp),
                 onClick = onToCalendar
             ) {
                 Text("To Calendar")
@@ -246,34 +258,29 @@ fun AutofillTextField(
     viewModel: TrackingViewModel,
     modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
 
-    val filtered = remember(value, exercises) {
-        exercises.filter {
-            it.name.startsWith(value, ignoreCase = true)
-        }
-    }
+    println("Value: $value")
+
 
     Column(modifier = modifier) {
         OutlinedTextField(
             value = value,
-            onValueChange = {
-                onValueChange(it)
-                expanded = it.isNotEmpty() && filtered.isNotEmpty()
-            },
+            onValueChange = onValueChange,
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth()
         )
-
-        if (expanded) {
             LazyColumn {
-                items(filtered) { exercise ->
+                items(exercises.filter {
+                    it.name.startsWith(value, ignoreCase = true)
+                }) { exercise ->
                     Text(
                         text = exercise.name,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
-
+                            .clickable(
+                                indication = null,
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) {
                                 viewModel.updateCurrentExerciseState(
                                     CurrExerciseState(
                                         name = exercise.name,
@@ -283,16 +290,13 @@ fun AutofillTextField(
                                         comments = exercise.comments
                                     )
                                 )
-
                                 viewModel.exercisePlateauMessage(exercise.name)
-
-                                expanded = false
                             }
                             .padding(8.dp)
                     )
+
                 }
             }
-        }
+
     }
 }
-

@@ -13,6 +13,7 @@ import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
+import com.example.athlekin.ui.workouts.toWorkout
 import com.google.common.io.Files.map
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -47,6 +48,12 @@ data class CurrExerciseState(
 )
 
 
+// get back
+// why doesnt exercisesByName update?
+// autofill stops working after clicking on one suggestion (should be constant) this is UI
+// move onto gemini integration
+
+
 @HiltViewModel
 class TrackingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
@@ -73,22 +80,14 @@ class TrackingViewModel @Inject constructor(
     var workoutEditId by mutableStateOf("")
         private set
 
-    // Map that contains {Exercise name : List of exercise objects with that name}
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val exercisesByName: StateFlow<Map<String, List<Exercise>>> =
-        authRepository.currentUserIdFlow
-            .flatMapLatest { uid ->
-                if (uid.isNullOrBlank()) {
-                    flowOf(emptyMap())
-                } else {
-                    workoutsRepo.getExercisesByName(flowOf(uid))
-                }
-            }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Eagerly,
-                initialValue = emptyMap()
-            )
+
+        val exercisesByName : StateFlow<Map<String, List<Exercise>>> = workoutsRepo
+            .getExercisesByName(authRepository.currentUserIdFlow)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyMap()
+        )
 
     // list of latest objects per exercise
     val pastExercisesList: StateFlow<List<Exercise>> =
@@ -199,6 +198,8 @@ class TrackingViewModel @Inject constructor(
     // MODIFIES: trackerUiState
     // EFFECTS: overwrite the viewmodel state to update the current exercise state
     fun updateCurrentExerciseState(details: CurrExerciseState) {
+        println("DEBUG: autofill exercise map ${exercisesByName.value}")
+        println("DEBUG: all exercises")
         trackerUiState = trackerUiState.copy(currExerciseState = details)
     }
 
