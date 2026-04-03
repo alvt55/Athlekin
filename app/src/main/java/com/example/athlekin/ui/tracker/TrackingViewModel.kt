@@ -73,7 +73,7 @@ class TrackingViewModel @Inject constructor(
     var workoutEditId by mutableStateOf("")
         private set
 
-    // Exercise name : List of exercise objects with that name
+    // Map that contains {Exercise name : List of exercise objects with that name}
     @OptIn(ExperimentalCoroutinesApi::class)
     val exercisesByName: StateFlow<Map<String, List<Exercise>>> =
         authRepository.currentUserIdFlow
@@ -86,11 +86,11 @@ class TrackingViewModel @Inject constructor(
             }
             .stateIn(
                 scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5000),
+                started = SharingStarted.Eagerly,
                 initialValue = emptyMap()
             )
 
-    // list of exercise objects with the latest entry per exercise
+    // list of latest objects per exercise
     val pastExercisesList: StateFlow<List<Exercise>> =
         exercisesByName
             .map { map ->
@@ -98,7 +98,7 @@ class TrackingViewModel @Inject constructor(
             }
             .stateIn(
                 viewModelScope,
-                SharingStarted.WhileSubscribed(5000),
+                SharingStarted.Eagerly,
                 emptyList()
             )
 
@@ -107,8 +107,8 @@ class TrackingViewModel @Inject constructor(
 
 
     // REQUIRES: exercise name
-    // MODIFIES:
-    // EFFECTS: returns a personalized message based on history with that exercise
+    // EFFECTS: determines whether a plateau has occurred given an exercise name,
+    // returns a personalized message based on plateau reason and improvements to be made
     fun exercisePlateauMessage(name: String) {
         val history = exercisesByName.value[name] ?: return
 

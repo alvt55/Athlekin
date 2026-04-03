@@ -61,13 +61,8 @@ fun TrackingScreen(
     val currExerciseState = trackerUiState.currExerciseState
     val exercises by viewModel.exercises.collectAsState()
 
-    val exercisesByName by viewModel.pastExercisesList.collectAsState()
-
-    val uniqueExerciseNames = exercisesByName
-        .groupBy { it.name }
-        .values
-        .map { it.last().name }
-
+    // for autofill
+    val latestExercises by viewModel.pastExercisesList.collectAsState()
 
     var isFocused by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
@@ -227,10 +222,9 @@ fun TrackingScreen(
                         currExerciseState.copy(name = it)
                     )
                 },
-                options = uniqueExerciseNames,
+                exercises = latestExercises,
                 label = stringResource(R.string.exercise_input),
-                viewModel = viewModel,
-                exercisesByName = exercisesByName
+                viewModel = viewModel
             )
 
 
@@ -243,27 +237,29 @@ fun TrackingScreen(
 
 }
 
-
 @Composable
 fun AutofillTextField(
-    exercisesByName : List<Exercise>,
+    exercises: List<Exercise>,
     value: String,
     onValueChange: (String) -> Unit,
-    options: List<String>,
     label: String,
-    viewModel : TrackingViewModel,
+    viewModel: TrackingViewModel,
     modifier: Modifier = Modifier
-
 ) {
     var expanded by remember { mutableStateOf(false) }
+
+    val filtered = remember(value, exercises) {
+        exercises.filter {
+            it.name.startsWith(value, ignoreCase = true)
+        }
+    }
 
     Column(modifier = modifier) {
         OutlinedTextField(
             value = value,
             onValueChange = {
                 onValueChange(it)
-                expanded =
-                    it.isNotEmpty() && options.any { opt -> opt.startsWith(it, ignoreCase = true) }
+                expanded = it.isNotEmpty() && filtered.isNotEmpty()
             },
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth()
@@ -271,36 +267,24 @@ fun AutofillTextField(
 
         if (expanded) {
             LazyColumn {
-                items(options.filter { it.startsWith(value, ignoreCase = true) }) { suggestion ->
+                items(filtered) { exercise ->
                     Text(
-                        text = suggestion,
+                        text = exercise.name,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                // fetch full exercise from ViewModel
-                                val exercise = exercisesByName.find {
-                                    it.name.equals(suggestion, ignoreCase = true)
-                                }
 
-                                if (exercise != null) {
-                                    viewModel.updateCurrentExerciseState(
-                                        CurrExerciseState(
-                                            name = exercise.name,
-                                            sets = exercise.sets,
-                                            reps = exercise.reps,
-                                            weight = exercise.weight,
-                                            comments = exercise.comments
-                                        )
+                                viewModel.updateCurrentExerciseState(
+                                    CurrExerciseState(
+                                        name = exercise.name,
+                                        sets = exercise.sets,
+                                        reps = exercise.reps,
+                                        weight = exercise.weight,
+                                        comments = exercise.comments
                                     )
+                                )
 
-                                    // TODO: add a call to plateau logic here, displaying a popup
-                                    viewModel.exercisePlateauMessage(exercise.name)
-                                } else {
-                                    // just set name if no past exercise exists
-                                    viewModel.updateCurrentExerciseState(
-                                        CurrExerciseState(name = suggestion)
-                                    )
-                                }
+                                viewModel.exercisePlateauMessage(exercise.name)
 
                                 expanded = false
                             }
@@ -312,4 +296,3 @@ fun AutofillTextField(
     }
 }
 
-private fun StateFlow<List<Exercise>>.find(function: () -> Boolean) {}

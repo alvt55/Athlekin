@@ -67,7 +67,7 @@ fun AthlekinApp(
 
         NavHost(
             navController = navController,
-            startDestination = AthelkinScreen.Calendar.name,
+            startDestination = AthelkinScreen.SignIn.name,
             modifier = Modifier.Companion.padding(innerPadding)
         ) {
             composable(route = AthelkinScreen.SignIn.name) {
