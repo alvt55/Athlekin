@@ -1,5 +1,6 @@
 package com.example.athlekin.model
 
+import android.R.attr.name
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 
@@ -13,6 +14,16 @@ data class WorkoutDoc(
     val exercises: List<Exercise> = emptyList()
 )
 
+
+data class PlateauAnalysis(
+    val exerciseName: String,
+    val historySize: Int,
+    val volumes: List<Double>,
+    val recentVolumes: List<Double>,
+    val initialVolume: Double,
+    val finalVolume: Double,
+    val percentageChange: Double,
+)
 
 // firebase and UI
 data class Exercise(

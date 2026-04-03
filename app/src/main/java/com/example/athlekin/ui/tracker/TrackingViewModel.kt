@@ -1,5 +1,6 @@
 package com.example.athlekin.ui.tracker
 
+import android.R.attr.prompt
 import android.util.Log.e
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -8,8 +9,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.data.AuthRepository
+import com.example.athlekin.data.GeminiRepo
 import com.example.athlekin.data.WorkoutsRepo
 import com.example.athlekin.model.Exercise
+import com.example.athlekin.model.PlateauAnalysis
 import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
@@ -48,17 +51,12 @@ data class CurrExerciseState(
 )
 
 
-// get back
-// why doesnt exercisesByName update?
-// autofill stops working after clicking on one suggestion (should be constant) this is UI
-// move onto gemini integration
-
-
 @HiltViewModel
 class TrackingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val workoutsRepo: WorkoutsRepo,
-    private val offlineExercisesRepo: OfflineExercisesRepo
+    private val offlineExercisesRepo: OfflineExercisesRepo,
+    private val geminiRepo: GeminiRepo
 ) : ViewModel() {
 
     var trackerUiState by mutableStateOf(TrackerUiState())
@@ -81,13 +79,13 @@ class TrackingViewModel @Inject constructor(
         private set
 
 
-        val exercisesByName : StateFlow<Map<String, List<Exercise>>> = workoutsRepo
-            .getExercisesByName(authRepository.currentUserIdFlow)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = emptyMap()
-        )
+    val exercisesByName : StateFlow<Map<String, List<Exercise>>> = workoutsRepo
+        .getExercisesByName(authRepository.currentUserIdFlow)
+    .stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = emptyMap()
+    )
 
     // list of latest objects per exercise
     val pastExercisesList: StateFlow<List<Exercise>> =
@@ -141,7 +139,22 @@ class TrackingViewModel @Inject constructor(
 
         // If increase is less than 5% over 3 sessions, consider it a plateau
         if (percentageChange < 0.05) {
-            plateauMessage = "Plateau detected for $name. Volume growth is at ${(percentageChange * 100).toInt()}%. Consider changing reps or intensity!"
+//            plateauMessage = "Plateau detected for $name. Volume growth is at ${(percentageChange * 100).toInt()}%. Consider changing reps or intensity!"
+
+            val analysis = PlateauAnalysis(
+                exerciseName = name,
+                historySize = history.size,
+                volumes = volumes,
+                recentVolumes = recent,
+                initialVolume = initialVolume,
+                finalVolume = finalVolume,
+                percentageChange = percentageChange,
+            )
+
+            viewModelScope.launch {
+                println("Plateau message: ${geminiRepo.generatePlateauMessage(analysis)}")
+            }
+
         } else {
             plateauMessage = "Great job! Your $name volume is up by ${(percentageChange * 100).toInt()}%."
         }
@@ -199,7 +212,6 @@ class TrackingViewModel @Inject constructor(
     // EFFECTS: overwrite the viewmodel state to update the current exercise state
     fun updateCurrentExerciseState(details: CurrExerciseState) {
         println("DEBUG: autofill exercise map ${exercisesByName.value}")
-        println("DEBUG: all exercises")
         trackerUiState = trackerUiState.copy(currExerciseState = details)
     }
 
@@ -226,6 +238,8 @@ class TrackingViewModel @Inject constructor(
     // EFFECTS: checks if the exercise is valid, and if so, adds to the room database, clears the current exercise ui state
     // ERROR MESSAGES: when exercise is invalid
     fun addExercise() {
+
+
 
         if (validateCurrentExerciseState(trackerUiState.currExerciseState)) {
 

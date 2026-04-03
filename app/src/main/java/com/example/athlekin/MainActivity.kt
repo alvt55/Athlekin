@@ -25,6 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.athlekin.ui.theme.AthlekinTheme
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.firestore
+import dagger.Provides
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -33,6 +39,9 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseAuth.getInstance().useEmulator("10.0.2.2", 9099)
+        FirebaseFirestore.getInstance().useEmulator("10.0.2.2", 8080)
+
         enableEdgeToEdge()
         setContent {
             AthlekinTheme {

@@ -208,7 +208,7 @@ fun TrackingScreen(
                     Text(trackerUiState.errorMessage)
                 }
 
-//                Text(viewModel.plateauMessage)
+                Text(viewModel.plateauMessage)
 
             }
 

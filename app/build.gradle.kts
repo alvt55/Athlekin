@@ -107,6 +107,9 @@ dependencies {
     // firestore
     implementation("com.google.firebase:firebase-firestore")
 
+    // gemini
+    implementation("com.google.firebase:firebase-ai")
+
 
     // room
     ksp("androidx.room:room-compiler:2.6.1")

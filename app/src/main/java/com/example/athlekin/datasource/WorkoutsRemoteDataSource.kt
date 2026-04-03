@@ -1,6 +1,9 @@
 package com.example.athlekin.datasource
 
 import com.example.athlekin.model.WorkoutDoc
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.dataObjects
@@ -13,6 +16,8 @@ import javax.inject.Inject
 class WorkoutsRemoteDataSource @Inject constructor(
     private val firestore: FirebaseFirestore
 ) {
+
+
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
