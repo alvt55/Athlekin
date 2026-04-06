@@ -117,7 +117,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
 
 
-
+    implementation("com.google.code.gson:gson:2.11.0")
 
 
 

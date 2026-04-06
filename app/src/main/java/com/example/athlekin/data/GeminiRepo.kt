@@ -8,8 +8,7 @@ class GeminiRepo @Inject constructor(
     private val geminiDataSource : GeminiDataSource
 )  {
 
-    // accepts an analysisObject from previous exercises
-    // generates a prompt tailored to that object and sends it over to the GeminiDataSource function
+    // accepts an analysisObject from previous exercies and sends it to geminiDataSource
     suspend fun generatePlateauMessage(analysisObject : PlateauAnalysis) : String? {
         return geminiDataSource.generateTextFromPrompt(analysisObject)
 
