@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.data.AuthRepository
+import com.example.athlekin.data.DataSeeder
 import com.example.athlekin.data.GeminiRepo
 import com.example.athlekin.data.WorkoutsRepo
 import com.example.athlekin.model.Exercise
@@ -56,7 +57,8 @@ class TrackingViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val workoutsRepo: WorkoutsRepo,
     private val offlineExercisesRepo: OfflineExercisesRepo,
-    private val geminiRepo: GeminiRepo
+    private val geminiRepo: GeminiRepo,
+    private val dataSeeder: DataSeeder
 ) : ViewModel() {
 
     var trackerUiState by mutableStateOf(TrackerUiState())
@@ -101,6 +103,18 @@ class TrackingViewModel @Inject constructor(
 
     var plateauMessage by mutableStateOf("")
         private set
+
+
+    fun seedData() {
+        viewModelScope.launch {
+            try {
+                dataSeeder.seedWorkouts()
+                trackerUiState = trackerUiState.copy(errorMessage = "Seed successful!")
+            } catch (e: Exception) {
+                trackerUiState = trackerUiState.copy(errorMessage = "Seed failed: ${e.message}")
+            }
+        }
+    }
 
 
     // REQUIRES: exercise name

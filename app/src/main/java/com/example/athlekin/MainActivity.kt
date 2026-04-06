@@ -39,8 +39,8 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        FirebaseAuth.getInstance().useEmulator("10.0.2.2", 9099)
-//        FirebaseFirestore.getInstance().useEmulator("10.0.2.2", 8080)
+        FirebaseAuth.getInstance().useEmulator("10.0.2.2", 9099)
+        FirebaseFirestore.getInstance().useEmulator("10.0.2.2", 8080)
 
         enableEdgeToEdge()
         setContent {

@@ -102,15 +102,25 @@ fun TrackingScreen(
             verticalArrangement = Arrangement.SpaceEvenly,
         ) {
 
-            Button(
-                onClick = {
-                    viewModel.signOut()
-                    onToSignIn()
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
-                shape = RoundedCornerShape(2.dp),
-            ) {
-                Text(text = "Sign Out")
+            Row {
+                Button(
+                    onClick = {
+                        viewModel.signOut()
+                        onToSignIn()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
+                    shape = RoundedCornerShape(2.dp),
+                ) {
+                    Text(text = "Sign Out")
+                }
+
+                Button(
+                    onClick = { viewModel.seedData() },
+                    shape = RoundedCornerShape(2.dp),
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    Text(text = "Seed Data")
+                }
             }
 
 
