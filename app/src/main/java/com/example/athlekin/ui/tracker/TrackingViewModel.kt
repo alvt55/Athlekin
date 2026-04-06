@@ -134,12 +134,15 @@ class TrackingViewModel @Inject constructor(
             return
         }
 
+        val recentComments = history.takeLast(3).map { it.comments }
+        println("DEBUG: Recent comments: $recentComments")
+
+
         val percentageChange = (finalVolume - initialVolume) / initialVolume
         println("DEBUG: Percentage change: ${String.format("%.2f", percentageChange * 100)}%")
 
         // If increase is less than 5% over 3 sessions, consider it a plateau
         if (percentageChange < 0.05) {
-//            plateauMessage = "Plateau detected for $name. Volume growth is at ${(percentageChange * 100).toInt()}%. Consider changing reps or intensity!"
 
             val analysis = PlateauAnalysis(
                 exerciseName = name,
@@ -149,11 +152,16 @@ class TrackingViewModel @Inject constructor(
                 initialVolume = initialVolume,
                 finalVolume = finalVolume,
                 percentageChange = percentageChange,
+                recentComments = recentComments
             )
 
             viewModelScope.launch {
-                println("Plateau message: ${geminiRepo.generatePlateauMessage(analysis)}")
+                println("DEBUG: Analysis: $analysis")
+                val plateauMessage = geminiRepo.generatePlateauMessage(analysis)
+                println("DEBUG: Plateau message: $plateauMessage")
             }
+
+            // TODO: set plateau message for UI
 
         } else {
             plateauMessage = "Great job! Your $name volume is up by ${(percentageChange * 100).toInt()}%."

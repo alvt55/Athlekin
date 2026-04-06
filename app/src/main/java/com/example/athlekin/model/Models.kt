@@ -23,6 +23,7 @@ data class PlateauAnalysis(
     val initialVolume: Double,
     val finalVolume: Double,
     val percentageChange: Double,
+    val recentComments: List<String>
 )
 
 // firebase and UI
