@@ -121,6 +121,9 @@ fun TrackingScreen(
                 ) {
                     Text(text = "Seed Data")
                 }
+
+                // for debug, delete later
+                Text(text = viewModel.userId)
             }
 
 

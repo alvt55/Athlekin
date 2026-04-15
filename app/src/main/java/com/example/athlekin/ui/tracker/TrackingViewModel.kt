@@ -80,12 +80,11 @@ class TrackingViewModel @Inject constructor(
     var workoutEditId by mutableStateOf("")
         private set
 
-
     val exercisesByName : StateFlow<Map<String, List<Exercise>>> = workoutsRepo
         .getExercisesByName(authRepository.currentUserIdFlow)
     .stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
+        started = SharingStarted.Eagerly,
         initialValue = emptyMap()
     )
 
@@ -97,12 +96,25 @@ class TrackingViewModel @Inject constructor(
             }
             .stateIn(
                 viewModelScope,
-                SharingStarted.Eagerly,
+                SharingStarted.WhileSubscribed(5_000),
                 emptyList()
             )
 
     var plateauMessage by mutableStateOf("")
         private set
+
+    // userId is for debugging, delete later
+    var userId by mutableStateOf("")
+        private set
+
+    init {
+        viewModelScope.launch {
+            authRepository.currentUserIdFlow.collect { id ->
+                userId = id ?: ""
+            }
+        }
+    }
+    //
 
 
     fun seedData() {
@@ -114,46 +126,38 @@ class TrackingViewModel @Inject constructor(
                 trackerUiState = trackerUiState.copy(errorMessage = "Seed failed: ${e.message}")
             }
         }
+
+
     }
 
 
     // REQUIRES: exercise name
     // EFFECTS: determines whether a plateau has occurred given an exercise name,
     // returns a personalized message based on plateau reason and improvements to be made
+    // returns a general message using volume calculations if no plateau has occurred
     fun exercisePlateauMessage(name: String) {
         val history = exercisesByName.value[name] ?: return
 
         println("DEBUG: Plateau check for $name")
-        println("DEBUG: History size: ${history.size}")
-
-        // Need at least 3 sessions to determine a trend
-        if (history.size < 3) {
-            println("DEBUG: Not enough history for plateau detection")
-            return
-        }
 
         // Calculate "Volume" for each session: weight * reps * sets
         val volumes = history.map { it.weight.toDouble() * it.reps * it.sets }
-        println("DEBUG: Calculated volumes: $volumes")
 
         val recent = volumes.takeLast(3)
         val initialVolume = recent.first()
         val finalVolume = recent.last()
 
-        println("DEBUG: Recent 3 volumes: $recent")
-        println("DEBUG: Comparing initial ($initialVolume) vs final ($finalVolume)")
-
-        if (initialVolume <= 0.0) {
-            println("DEBUG: Initial volume is 0, skipping calculation")
-            return
-        }
 
         val recentComments = history.takeLast(3).map { it.comments }
-        println("DEBUG: Recent comments: $recentComments")
 
 
         val percentageChange = (finalVolume - initialVolume) / initialVolume
-        println("DEBUG: Percentage change: ${String.format("%.2f", percentageChange * 100)}%")
+
+        // Need at least 3 valid sessions to determine a trend
+        if (history.size < 3 || initialVolume <= 0.0) {
+            println("DEBUG: Not enough data to determine plateau")
+            return
+        }
 
         // If increase is less than 5% over 3 sessions, consider it a plateau
         if (percentageChange < 0.05) {
@@ -170,7 +174,6 @@ class TrackingViewModel @Inject constructor(
             )
 
             viewModelScope.launch {
-                println("DEBUG: Analysis: $analysis")
                 val plateauMessage = geminiRepo.generatePlateauMessage(analysis)
                 println("DEBUG: Plateau message: $plateauMessage")
             }
@@ -233,7 +236,7 @@ class TrackingViewModel @Inject constructor(
     // MODIFIES: trackerUiState
     // EFFECTS: overwrite the viewmodel state to update the current exercise state
     fun updateCurrentExerciseState(details: CurrExerciseState) {
-        println("DEBUG: autofill exercise map ${exercisesByName.value}")
+
         trackerUiState = trackerUiState.copy(currExerciseState = details)
     }
 
@@ -261,7 +264,9 @@ class TrackingViewModel @Inject constructor(
     // ERROR MESSAGES: when exercise is invalid
     fun addExercise() {
 
-
+        viewModelScope.launch {
+            println("DEBUG: Firebase user ID ${authRepository.currentUserIdFlow.first()}")
+        }
 
         if (validateCurrentExerciseState(trackerUiState.currExerciseState)) {
 

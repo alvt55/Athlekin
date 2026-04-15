@@ -30,6 +30,7 @@ class SignInViewModel @Inject constructor(
 
         viewModelScope.launch {
             val result = authRepository.signIn(email, password)
+            println("DEBUG: Sign in result: $result")
 
             result.onSuccess {
                 _shouldGoTracker.value = true

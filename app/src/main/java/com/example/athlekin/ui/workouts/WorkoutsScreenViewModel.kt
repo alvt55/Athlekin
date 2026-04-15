@@ -32,7 +32,7 @@ class WorkoutsScreenViewModel @Inject constructor(
         .map { workoutDocs -> workoutDocs.map { it.toWorkout() } }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
+            started = SharingStarted.Eagerly,
             initialValue = emptyList()
         )
 
