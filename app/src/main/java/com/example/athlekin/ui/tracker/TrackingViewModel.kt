@@ -80,13 +80,13 @@ class TrackingViewModel @Inject constructor(
     var workoutEditId by mutableStateOf("")
         private set
 
-    val exercisesByName : StateFlow<Map<String, List<Exercise>>> = workoutsRepo
+    val exercisesByName: StateFlow<Map<String, List<Exercise>>> = workoutsRepo
         .getExercisesByName(authRepository.currentUserIdFlow)
-    .stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Eagerly,
-        initialValue = emptyMap()
-    )
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyMap()
+        )
 
     // list of latest objects per exercise
     val pastExercisesList: StateFlow<List<Exercise>> =
@@ -138,19 +138,13 @@ class TrackingViewModel @Inject constructor(
     fun exercisePlateauMessage(name: String) {
         val history = exercisesByName.value[name] ?: return
 
-        println("DEBUG: Plateau check for $name")
-
-        // Calculate "Volume" for each session: weight * reps * sets
         val volumes = history.map { it.weight.toDouble() * it.reps * it.sets }
 
         val recent = volumes.takeLast(3)
         val initialVolume = recent.first()
         val finalVolume = recent.last()
 
-
         val recentComments = history.takeLast(3).map { it.comments }
-
-
         val percentageChange = (finalVolume - initialVolume) / initialVolume
 
         // Need at least 3 valid sessions to determine a trend
@@ -176,16 +170,14 @@ class TrackingViewModel @Inject constructor(
             viewModelScope.launch {
                 val plateauMessage = geminiRepo.generatePlateauMessage(analysis)
                 println("DEBUG: Plateau message: $plateauMessage")
+                // TODO: set plateau message for UI
             }
 
-            // TODO: set plateau message for UI
-
         } else {
-            plateauMessage = "Great job! Your $name volume is up by ${(percentageChange * 100).toInt()}%."
+            plateauMessage =
+                "Great job! Your $name volume is up by ${(percentageChange * 100).toInt()}%."
         }
     }
-
-
 
 
     // REQUIRES: workoutId is the Firebase id of the workout to edit, or empty string if not editing
@@ -223,20 +215,15 @@ class TrackingViewModel @Inject constructor(
                 } else {
                     trackerUiState = trackerUiState.copy(errorMessage = "Invalid Workout to Edit")
                 }
-
-
             }
         }
 
     }
 
 
-
-
     // MODIFIES: trackerUiState
     // EFFECTS: overwrite the viewmodel state to update the current exercise state
     fun updateCurrentExerciseState(details: CurrExerciseState) {
-
         trackerUiState = trackerUiState.copy(currExerciseState = details)
     }
 
@@ -264,9 +251,6 @@ class TrackingViewModel @Inject constructor(
     // ERROR MESSAGES: when exercise is invalid
     fun addExercise() {
 
-        viewModelScope.launch {
-            println("DEBUG: Firebase user ID ${authRepository.currentUserIdFlow.first()}")
-        }
 
         if (validateCurrentExerciseState(trackerUiState.currExerciseState)) {
 
@@ -289,10 +273,9 @@ class TrackingViewModel @Inject constructor(
             }
 
 
-
-
             // reset input fields
-            trackerUiState = trackerUiState.copy(currExerciseState = CurrExerciseState(), errorMessage = null)
+            trackerUiState =
+                trackerUiState.copy(currExerciseState = CurrExerciseState(), errorMessage = null)
         } else {
             trackerUiState = trackerUiState.copy(errorMessage = "Invalid Exercise")
         }
@@ -310,51 +293,50 @@ class TrackingViewModel @Inject constructor(
         viewModelScope.launch {
             val uid = authRepository.currentUserIdFlow.first()
 
-                if (uid.isNullOrBlank()) {
+            if (uid.isNullOrBlank()) {
 
-                    trackerUiState = trackerUiState.copy(errorMessage = "Please login first")
-                } else {
-                    if (exercises.value.isNotEmpty() && trackerUiState.workoutName.isNotBlank()) {
-                        // add workout based on UI fields
-                        val workoutDocToAdd = WorkoutDoc(
-                            ownerId = uid,
-                            name = trackerUiState.workoutName,
-                            exercises = exercises.value.map {
-                                it.copy(roomId = 0)  // explicitly reset it to 0
-                            }
-                        )
+                trackerUiState = trackerUiState.copy(errorMessage = "Please login first")
+            } else {
+                if (exercises.value.isNotEmpty() && trackerUiState.workoutName.isNotBlank()) {
+                    // add workout based on UI fields
+                    val workoutDocToAdd = WorkoutDoc(
+                        ownerId = uid,
+                        name = trackerUiState.workoutName,
+                        exercises = exercises.value.map {
+                            it.copy(roomId = 0)  // explicitly reset it to 0
+                        }
+                    )
 
-                        try {
+                    try {
 
-
-                            if (workoutEditId.isNotBlank() && workoutsRepo.getWorkout(workoutEditId) != null) {
-                                workoutsRepo.updateWorkout(workoutDocToAdd.copy(id = workoutEditId))
-                                workoutEditId = ""
-                            } else {
-                                workoutsRepo.createWorkout(workoutDocToAdd)
-                            }
-
-                            // reset UI state and local storage after adding
-                            offlineExercisesRepo.deleteAllExercises()
-                            trackerUiState = trackerUiState.copy(
-                                workoutName = "",
-                                currExerciseState = CurrExerciseState(),
-                                errorMessage = null
-                            )
-                        } catch (e: Exception) {
-                            // error saving workout
-                            trackerUiState =
-                                trackerUiState.copy(errorMessage = "Error saving workout to database")
+                        if (workoutEditId.isNotBlank() && workoutsRepo.getWorkout(workoutEditId) != null) {
+                            workoutsRepo.updateWorkout(workoutDocToAdd.copy(id = workoutEditId))
+                            workoutEditId = ""
+                        } else {
+                            workoutsRepo.createWorkout(workoutDocToAdd)
                         }
 
-
-                    } else {
-                        // Missing workout name or exercises
+                        // reset UI state and local storage after adding
+                        offlineExercisesRepo.deleteAllExercises()
+                        trackerUiState = trackerUiState.copy(
+                            workoutName = "",
+                            currExerciseState = CurrExerciseState(),
+                            errorMessage = null
+                        )
+                    } catch (e: Exception) {
+                        // error saving workout
                         trackerUiState =
-                            trackerUiState.copy(errorMessage = "Please enter a workout name and add at least one exercise")
+                            trackerUiState.copy(errorMessage = "Error saving workout to database")
                     }
+
+
+                } else {
+                    // Missing workout name or exercises
+                    trackerUiState =
+                        trackerUiState.copy(errorMessage = "Please enter a workout name and add at least one exercise")
                 }
             }
+        }
 
     }
 
@@ -364,7 +346,6 @@ class TrackingViewModel @Inject constructor(
     // ERROR MESSAGE: issues with the Firebase deletion
     fun deleteExercise(roomId: Int) {
         viewModelScope.launch {
-
             try {
                 offlineExercisesRepo.deleteExerciseById(roomId)
             } catch (e: Exception) {
@@ -378,7 +359,6 @@ class TrackingViewModel @Inject constructor(
     // EFFECTS: calls signout function for auth repo
     // ERROR MESSAGE: issues with the Firebase sign out
     fun signOut() {
-
         try {
             authRepository.signOut()
         } catch (e: Exception) {
