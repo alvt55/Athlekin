@@ -98,21 +98,6 @@ fun AthlekinApp(
                     contentType = contentType
                 )
             }
-
-            // TODO: update workout screen passing in the workoutId
-//            composable(
-//                route = "AthelkinScreen.Tracking.name?workoutId={workoutId}",
-//                arguments = listOf(
-//                    navArgument("workoutId") {
-//                        type = NavType.StringType
-//                        nullable = true
-//                        defaultValue = null
-//                    }
-//                )
-//            ) { backStackEntry ->
-//
-//                TrackingScreen()
-//            }
             composable(route = AthelkinScreen.Workouts.name) {
                 val context = LocalContext.current
                 val viewModel = hiltViewModel<WorkoutsScreenViewModel>()

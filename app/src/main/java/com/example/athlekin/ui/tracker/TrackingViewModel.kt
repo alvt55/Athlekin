@@ -80,6 +80,8 @@ class TrackingViewModel @Inject constructor(
     var workoutEditId by mutableStateOf("")
         private set
 
+    // Map of exercises organized by name
+    // provides exercise history for plateau logic
     val exercisesByName: StateFlow<Map<String, List<Exercise>>> = workoutsRepo
         .getExercisesByName(authRepository.currentUserIdFlow)
         .stateIn(
@@ -89,6 +91,7 @@ class TrackingViewModel @Inject constructor(
         )
 
     // list of latest objects per exercise
+    // used for autofill options
     val pastExercisesList: StateFlow<List<Exercise>> =
         exercisesByName
             .map { map ->
@@ -99,6 +102,15 @@ class TrackingViewModel @Inject constructor(
                 SharingStarted.WhileSubscribed(5_000),
                 emptyList()
             )
+
+    // FOR DEBUGGING EXERCISE LIST UPDATES
+    init {
+        viewModelScope.launch {
+            exercisesByName.collect { data ->
+                println("DEBUG exercisesByName: $data")
+            }
+        }
+    }
 
     var plateauMessage by mutableStateOf("")
         private set

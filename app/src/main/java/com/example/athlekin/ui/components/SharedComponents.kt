@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.athlekin.R
 import com.example.athlekin.model.Exercise
-import com.example.athlekin.model.Workout
 
 
 @Composable
@@ -114,7 +113,6 @@ fun ExerciseList(
                 ExerciseItem(
                     exercise = it,
                     onExerciseDelete = onExerciseDelete,
-//                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_medium))
                     modifier = Modifier.padding(10.dp)
                 )
             }

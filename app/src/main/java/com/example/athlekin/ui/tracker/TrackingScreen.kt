@@ -2,7 +2,7 @@ package com.example.athlekin.ui.tracker
 
 
 
-import android.R.attr.label
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -46,8 +46,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.athlekin.model.Exercise
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 
 @Composable
 fun TrackingScreen(
@@ -271,9 +269,6 @@ fun AutofillTextField(
     viewModel: TrackingViewModel,
     modifier: Modifier = Modifier
 ) {
-
-    println("Value: $value")
-
 
     Column(modifier = modifier) {
         OutlinedTextField(

@@ -39,13 +39,7 @@ class WorkoutsRemoteDataSource @Inject constructor(
             .toObject(WorkoutDoc::class.java)
 
     }
-
-
-    // TODO
-//    fun getUserExercises(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
-//
-//    }
-
+    
     suspend fun update(workoutDoc: WorkoutDoc) {
         firestore.collection(WORKOUTS_COLLECTION).document(workoutDoc.id).set(workoutDoc).await()
     }

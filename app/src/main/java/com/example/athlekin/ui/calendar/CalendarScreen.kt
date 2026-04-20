@@ -47,15 +47,6 @@ fun CalendarScreen(
         }
     }
 
-//    // Call API when permission is granted
-//    LaunchedEffect(calendarPermissionState.status.isGranted) {
-//        Log.d(WORKOUTS_SCREEN_TAG, "Permission status: ${calendarPermissionState.status.isGranted}")
-//        if (calendarPermissionState.status.isGranted) {
-//            Log.d(WORKOUTS_SCREEN_TAG, "Calling getAvailableSlots()")
-//            calendarViewModel.getAvailableSlots()
-//        }
-//    }
-
     if (viewModel.showDateRangeModal) {
         DateRangePickerModal(
             onDateRangeSelected = {

@@ -23,7 +23,7 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
 
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
-            Result.success(auth.currentUser!!)  // TODO: should this return the flow instead?
+            Result.success(auth.currentUser!!)
         } catch (e: Exception) {
             Result.failure(e)
         }

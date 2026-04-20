@@ -48,9 +48,3 @@ data class Workout(
 )
 
 
-data class TimeSlot(
-    val startTime: Long = 0,
-    val endTime: Long = 0,
-    val available: Boolean = false
-)
-
