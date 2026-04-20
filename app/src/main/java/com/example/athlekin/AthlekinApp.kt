@@ -1,8 +1,6 @@
 package com.example.athlekin
 
 import SignInScreen
-import android.R.attr.name
-import android.R.attr.type
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.layout.padding
@@ -15,12 +13,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.athlekin.ui.calendar.CalendarScreen
 import com.example.athlekin.ui.calendar.CalendarViewModel
 import com.example.athlekin.ui.createAccount.CreateAccountScreen

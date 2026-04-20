@@ -1,9 +1,6 @@
 package com.example.athlekin.datasource
 
 import com.example.athlekin.model.WorkoutDoc
-import com.google.firebase.Firebase
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.dataObjects
@@ -18,7 +15,6 @@ class WorkoutsRemoteDataSource @Inject constructor(
 ) {
 
 
-
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
         return currentUserIdFlow.flatMapLatest { ownerId ->
@@ -30,7 +26,7 @@ class WorkoutsRemoteDataSource @Inject constructor(
         }
     }
 
-   suspend fun getWorkout(id: String): WorkoutDoc? {
+    suspend fun getWorkout(id: String): WorkoutDoc? {
         return firestore
             .collection(WORKOUTS_COLLECTION)
             .document(id)
@@ -39,7 +35,7 @@ class WorkoutsRemoteDataSource @Inject constructor(
             .toObject(WorkoutDoc::class.java)
 
     }
-    
+
     suspend fun update(workoutDoc: WorkoutDoc) {
         firestore.collection(WORKOUTS_COLLECTION).document(workoutDoc.id).set(workoutDoc).await()
     }

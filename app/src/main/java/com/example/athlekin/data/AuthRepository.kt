@@ -19,7 +19,7 @@ class AuthRepository @Inject constructor(
         return authRemoteDataSource.createAccount(email, password)
     }
 
-    fun signOut() : Result<FirebaseUser>{
+    fun signOut(): Result<FirebaseUser> {
         return authRemoteDataSource.signOut()
     }
 

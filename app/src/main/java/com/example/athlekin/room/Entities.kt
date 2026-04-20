@@ -5,7 +5,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 
-
 // room entity model
 @Entity(tableName = "exercises")
 data class ExerciseEntity(

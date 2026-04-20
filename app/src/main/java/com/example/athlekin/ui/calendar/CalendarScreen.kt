@@ -71,7 +71,7 @@ fun CalendarScreen(
         viewModel.slot?.let { (start, end) ->
             val dateFormatter = SimpleDateFormat("EEEE, MMM d", Locale.getDefault())
             val timeFormatter = SimpleDateFormat("h:mm a", Locale.getDefault())
-            
+
             Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     text = "Best available slot:",

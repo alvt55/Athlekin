@@ -5,7 +5,6 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -39,7 +38,7 @@ class AuthRemoteDataSource @Inject constructor(private val auth: FirebaseAuth) {
         }
     }
 
-    fun signOut() : Result<FirebaseUser>{
+    fun signOut(): Result<FirebaseUser> {
 
         return try {
             auth.signOut()

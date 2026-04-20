@@ -1,8 +1,6 @@
 package com.example.athlekin.ui.tracker
 
 
-
-
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -17,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
@@ -31,21 +30,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.athlekin.R
+import com.example.athlekin.model.Exercise
 import com.example.athlekin.ui.components.ExerciseList
 import com.example.athlekin.ui.components.NumberStepper
 import com.example.athlekin.ui.utils.AthelkinContentType
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.athlekin.model.Exercise
 
 @Composable
 fun TrackingScreen(
@@ -125,10 +123,9 @@ fun TrackingScreen(
             }
 
 
-
             // Exercise Input fields
             Column {
-                Row{
+                Row {
                     NumberStepper(
                         value = currExerciseState.sets,
                         onValueChange = {
@@ -231,7 +228,9 @@ fun TrackingScreen(
             }
 
             Button(
-                modifier = Modifier.fillMaxWidth().size(1.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .size(1.dp),
                 onClick = onToCalendar
             ) {
                 Text("To Calendar")
@@ -277,34 +276,34 @@ fun AutofillTextField(
             label = { Text(label) },
             modifier = Modifier.fillMaxWidth()
         )
-            LazyColumn {
-                items(exercises.filter {
-                    it.name.startsWith(value, ignoreCase = true)
-                }) { exercise ->
-                    Text(
-                        text = exercise.name,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(
-                                indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) {
-                                viewModel.updateCurrentExerciseState(
-                                    CurrExerciseState(
-                                        name = exercise.name,
-                                        sets = exercise.sets,
-                                        reps = exercise.reps,
-                                        weight = exercise.weight,
-                                        comments = exercise.comments
-                                    )
+        LazyColumn {
+            items(exercises.filter {
+                it.name.startsWith(value, ignoreCase = true)
+            }) { exercise ->
+                Text(
+                    text = exercise.name,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            viewModel.updateCurrentExerciseState(
+                                CurrExerciseState(
+                                    name = exercise.name,
+                                    sets = exercise.sets,
+                                    reps = exercise.reps,
+                                    weight = exercise.weight,
+                                    comments = exercise.comments
                                 )
-                                viewModel.exercisePlateauMessage(exercise.name)
-                            }
-                            .padding(8.dp)
-                    )
+                            )
+                            viewModel.exercisePlateauMessage(exercise.name)
+                        }
+                        .padding(8.dp)
+                )
 
-                }
             }
+        }
 
     }
 }

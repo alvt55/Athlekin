@@ -1,13 +1,10 @@
 package com.example.athlekin.ui.tracker
 
-import android.R.attr.prompt
-import android.util.Log.e
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.athlekin.data.AuthRepository
 import com.example.athlekin.data.DataSeeder
 import com.example.athlekin.data.GeminiRepo
@@ -17,20 +14,12 @@ import com.example.athlekin.model.PlateauAnalysis
 import com.example.athlekin.model.WorkoutDoc
 import com.example.athlekin.room.ExerciseEntity
 import com.example.athlekin.room.OfflineExercisesRepo
-import com.example.athlekin.ui.workouts.toWorkout
-import com.google.common.io.Files.map
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.WhileSubscribed
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

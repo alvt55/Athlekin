@@ -156,7 +156,10 @@ fun WorkoutCard(workout: Workout, onDelete: () -> Unit) {
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
-                text = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).format(workout.createdAt.toDate()),
+                text = SimpleDateFormat(
+                    "MMM d, yyyy",
+                    Locale.getDefault()
+                ).format(workout.createdAt.toDate()),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -216,7 +219,13 @@ fun WorkoutListPreview() {
             createdAt = Timestamp.now(),
             exercises = listOf(
                 Exercise(name = "Bench Press", reps = 10, sets = 3, weight = 135),
-                Exercise(name = "Incline Flys", reps = 12, sets = 3, weight = 25, comments = "Felt a bit of a stretch in the shoulders today.")
+                Exercise(
+                    name = "Incline Flys",
+                    reps = 12,
+                    sets = 3,
+                    weight = 25,
+                    comments = "Felt a bit of a stretch in the shoulders today."
+                )
             )
         ),
         Workout(

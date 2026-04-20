@@ -3,9 +3,6 @@ package com.example.athlekin.data
 import com.example.athlekin.datasource.WorkoutsRemoteDataSource
 import com.example.athlekin.model.Exercise
 import com.example.athlekin.model.WorkoutDoc
-import com.google.firebase.Firebase
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerativeBackend
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -18,14 +15,13 @@ interface WorkoutPageRepo {
     suspend fun updateWorkout(workoutDoc: WorkoutDoc)
 
     fun getExercisesByName(currentUserIdFlow: Flow<String?>): Flow<Map<String, List<Exercise>>>
-    
+
 
 }
 
 class WorkoutsRepo @Inject constructor(
     private val workoutsRemoteDataSource: WorkoutsRemoteDataSource
 ) : WorkoutPageRepo {
-
 
 
     override fun getWorkouts(currentUserIdFlow: Flow<String?>): Flow<List<WorkoutDoc>> {
@@ -35,6 +31,7 @@ class WorkoutsRepo @Inject constructor(
     override suspend fun getWorkout(id: String): WorkoutDoc? {
         return workoutsRemoteDataSource.getWorkout(id)
     }
+
     override fun getExercisesByName(
         currentUserIdFlow: Flow<String?>
     ): Flow<Map<String, List<Exercise>>> {

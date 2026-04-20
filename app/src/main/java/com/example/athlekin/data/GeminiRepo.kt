@@ -5,11 +5,11 @@ import com.example.athlekin.model.PlateauAnalysis
 import javax.inject.Inject
 
 class GeminiRepo @Inject constructor(
-    private val geminiDataSource : GeminiDataSource
-)  {
+    private val geminiDataSource: GeminiDataSource
+) {
 
     // accepts an analysisObject from previous exercies and sends it to geminiDataSource
-    suspend fun generatePlateauMessage(analysisObject : PlateauAnalysis) : String? {
+    suspend fun generatePlateauMessage(analysisObject: PlateauAnalysis): String? {
         return geminiDataSource.generateTextFromPrompt(analysisObject)
 
     }

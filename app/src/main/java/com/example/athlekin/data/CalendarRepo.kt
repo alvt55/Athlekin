@@ -11,8 +11,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
-import java.time.Instant
-import java.time.ZoneId
 import java.util.Calendar
 import javax.inject.Inject
 
@@ -39,7 +37,7 @@ class CalendarRepo @Inject constructor(
 
     // takes in start and end boundaries - computes the best timeslot based on past workouts
     // TODO: handle date picker time zones
-    suspend fun queryCalendars(start: Long, end: Long) : Pair<Long, Long>? {
+    suspend fun queryCalendars(start: Long, end: Long): Pair<Long, Long>? {
 
 
         // stores time slots that a user has events occuring
@@ -106,7 +104,6 @@ class CalendarRepo @Inject constructor(
                 .eachCount()
 
 
-
             var bestScore: Pair<Pair<Long, Long>, Double> = Pair(Pair(0L, 0L), 0.0)
 
             for (slot in timeSlots) {
@@ -123,8 +120,6 @@ class CalendarRepo @Inject constructor(
         }
 
         return null
-
-
 
 
     }

@@ -1,6 +1,5 @@
 package com.example.athlekin.model
 
-import android.R.attr.name
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentId
 
