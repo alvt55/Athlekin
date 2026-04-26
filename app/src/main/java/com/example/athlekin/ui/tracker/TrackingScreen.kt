@@ -3,12 +3,12 @@ package com.example.athlekin.ui.tracker
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,19 +44,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.athlekin.R
 import com.example.athlekin.model.Exercise
-import com.example.athlekin.ui.theme.AthlekinTheme
 import com.example.athlekin.ui.utils.AthelkinContentType
 
 @Composable
@@ -207,6 +204,32 @@ fun TrackingScreen(
                 }
             }
 
+            // Coach's Insight Card (Plateau Message)
+            item {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .defaultMinSize(minHeight = 80.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.3f)
+                    )
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text(
+                            text = "Coach's Insight",
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = if (viewModel.plateauMessage.isNotEmpty()) viewModel.plateauMessage else "Select an exercise to see your coach's insight and progress analysis.",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+            }
+
             // Current Workout List Header
             if (exercises.isNotEmpty()) {
                 item {
@@ -251,14 +274,6 @@ fun TrackingScreen(
                                 color = MaterialTheme.colorScheme.error,
                                 style = MaterialTheme.typography.labelSmall,
                                 modifier = Modifier.padding(top = 4.dp)
-                            )
-                        }
-                        
-                        if (viewModel.plateauMessage.isNotEmpty()) {
-                            Text(
-                                text = viewModel.plateauMessage,
-                                style = MaterialTheme.typography.labelSmall,
-                                modifier = Modifier.padding(top = 8.dp)
                             )
                         }
 

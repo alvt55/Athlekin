@@ -169,9 +169,9 @@ class TrackingViewModel @Inject constructor(
             )
 
             viewModelScope.launch {
-                val plateauMessage = geminiRepo.generatePlateauMessage(analysis)
-                println("DEBUG: Plateau message: $plateauMessage")
-                // TODO: set plateau message for UI
+                val message = geminiRepo.generatePlateauMessage(analysis)
+                println("DEBUG: Plateau message: $message")
+                plateauMessage = message ?: "Error generating plateau message"
             }
 
         } else {
