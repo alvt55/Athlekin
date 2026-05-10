@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -61,6 +63,7 @@ fun TrackingScreen(
     onToWorkoutsClicked: () -> Unit,
     onToSignIn: () -> Unit,
     onToCalendar: () -> Unit,
+    onToPlateauTest: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: TrackingViewModel,
     contentType: AthelkinContentType
@@ -98,6 +101,27 @@ fun TrackingScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Button(
+                        onClick = onToPlateauTest,
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.height(32.dp),
+                        shape = RoundedCornerShape(4.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Icon(Icons.Default.Science, contentDescription = null, modifier = Modifier.size(14.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text("Test LLM", fontSize = 11.sp)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick = { viewModel.seedData() },
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        modifier = Modifier.height(32.dp),
+                        shape = RoundedCornerShape(4.dp)
+                    ) {
+                        Text("Seed", fontSize = 12.sp)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Button(
                         onClick = {
                             viewModel.signOut()
                             onToSignIn()
@@ -108,15 +132,6 @@ fun TrackingScreen(
                         shape = RoundedCornerShape(4.dp)
                     ) {
                         Text("Sign Out", fontSize = 12.sp)
-                    }
-                    Spacer(Modifier.width(8.dp))
-                    Button(
-                        onClick = { viewModel.seedData() },
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                        modifier = Modifier.height(32.dp),
-                        shape = RoundedCornerShape(4.dp)
-                    ) {
-                        Text("Seed", fontSize = 12.sp)
                     }
                 }
             }
@@ -329,7 +344,11 @@ fun ExerciseListItem(exercise: Exercise, onDelete: () -> Unit) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(exercise.name, fontWeight = FontWeight.Bold)
+                Text(
+                    text = "${exercise.name}: ${exercise.sets} x ${exercise.reps} @ ${exercise.weight}lbs",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold
+                )
                 if (exercise.comments.isNotBlank()) {
                     Text(
                         text = if (isExpanded) " -" else " +",
@@ -339,10 +358,6 @@ fun ExerciseListItem(exercise: Exercise, onDelete: () -> Unit) {
                     )
                 }
             }
-            Text(
-                "${exercise.sets} sets x ${exercise.reps} reps @ ${exercise.weight} lbs",
-                style = MaterialTheme.typography.bodySmall
-            )
             if (isExpanded && exercise.comments.isNotEmpty()) {
                 Text(
                     exercise.comments,

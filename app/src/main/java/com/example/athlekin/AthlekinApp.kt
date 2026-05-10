@@ -22,6 +22,7 @@ import com.example.athlekin.ui.calendar.CalendarViewModel
 import com.example.athlekin.ui.createAccount.CreateAccountScreen
 import com.example.athlekin.ui.createAccount.CreateAccountViewModel
 import com.example.athlekin.ui.login.SignInViewModel
+import com.example.athlekin.ui.tracker.PlateauTestScreen
 import com.example.athlekin.ui.tracker.TrackingScreen
 import com.example.athlekin.ui.tracker.TrackingViewModel
 import com.example.athlekin.ui.utils.AthelkinContentType
@@ -89,6 +90,7 @@ fun AthlekinApp(
                     onToWorkoutsClicked = { navController.navigate(AthelkinScreen.Workouts.name) },
                     onToSignIn = { navController.navigate(AthelkinScreen.SignIn.name) },
                     onToCalendar = { navController.navigate(AthelkinScreen.Calendar.name) },
+                    onToPlateauTest = { navController.navigate(AthelkinScreen.PlateauTest.name) },
                     modifier = Modifier,
                     viewModel = trackingViewModel,
                     contentType = contentType
@@ -115,6 +117,10 @@ fun AthlekinApp(
                     onToTrackingClicked = { navController.navigate(AthelkinScreen.Tracking.name) },
                     viewModel = viewModel,
                 )
+            }
+
+            composable(route = AthelkinScreen.PlateauTest.name) {
+                PlateauTestScreen()
             }
 
         }

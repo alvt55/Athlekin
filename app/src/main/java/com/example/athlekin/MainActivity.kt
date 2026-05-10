@@ -104,8 +104,8 @@ enum class AthelkinScreen(@StringRes val title: Int) {
     Workouts(title = R.string.workouts_page),
     CreateAccount(title = R.string.create_account),
     SignIn(title = R.string.signin),
-    Calendar(title = R.string.calendar)
-
+    Calendar(title = R.string.calendar),
+    PlateauTest(title = R.string.tracking_page)
 }
 
 
@@ -137,4 +137,3 @@ fun AthelkinAppBar(
         }
     )
 }
-
