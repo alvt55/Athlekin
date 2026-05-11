@@ -42,6 +42,7 @@ data class TestResult(
     val isError: Boolean = false
 )
 
+// Plateau Test Screen, used for experimenting with different models on Firebase AI
 @OptIn(PublicPreviewAPI::class)
 @Composable
 fun PlateauTestScreen() {
