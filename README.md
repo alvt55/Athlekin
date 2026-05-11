@@ -1,3 +1,8 @@
+
+
+https://github.com/user-attachments/assets/5c1f6f91-0300-4a37-9801-5b724502e1a8
+
+
 # Athlekin 🏋️‍♂️
 
 Athlekin is a modern, full-stack Android workout tracking application designed to provide intelligent insights into physical progression. Built with **Jetpack Compose**, it leverages the **Gemini LLM API** to act as a virtual fitness coach, detecting performance plateaus and offering science-based strategies for improvement.
